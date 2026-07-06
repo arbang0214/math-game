@@ -128,7 +128,7 @@ test('question 단계에서 next를 부르면 에러', () => {
 });
 
 console.log('gameover (결정적)');
-test('오답 3번이면 gameover 단계', () => {
+test(`오답 ${MAX_HEARTS}번이면 gameover 단계`, () => {
   let s = createGame(fakeRng([0, 0, 0, 0]));
   for (let i = 0; i < MAX_HEARTS; i++) {
     const wrong = s.problem.answer === 'left' ? 'right' : 'left';
@@ -153,11 +153,10 @@ test('시간 초과로도 gameover가 된다', () => {
 });
 test('gameover 단계에서 answer·next를 부르면 에러', () => {
   let s = createGame(fakeRng([0, 0, 0, 0]));
-  s = answer(s, 'right');
-  s = next(s, fakeRng([0, 0, 0, 0]));
-  s = answer(s, s.problem.answer === 'left' ? 'right' : 'left');
-  s = next(s, fakeRng([0, 0, 0, 0]));
-  s = answer(s, s.problem.answer === 'left' ? 'right' : 'left'); // 하트 0 → gameover
+  for (let i = 0; i < MAX_HEARTS; i++) {
+    s = answer(s, s.problem.answer === 'left' ? 'right' : 'left');
+    if (i < MAX_HEARTS - 1) s = next(s, fakeRng([0, 0, 0, 0]));
+  }
   assert(s.phase === 'gameover', `준비 실패: ${s.phase}`);
   for (const fn of [() => answer(s, 'left'), () => next(s)]) {
     let threw = false;
