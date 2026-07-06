@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>분수/소수 타임어택</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #f5f7fb;
+    }
+    #prompt {
+      font-size: 1.3rem;
+      margin-bottom: 1.5rem;
+    }
+    #choices {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .choice {
+      font-size: 2.5rem;
+      padding: 1.2rem 2rem;
+      min-width: 7rem;
+      border: 2px solid #444;
+      border-radius: 12px;
+      background: white;
+      cursor: pointer;
+    }
+    .choice:disabled {
+      cursor: default;
+      opacity: 0.6;
+    }
+    #vs {
+      font-size: 1.5rem;
+      color: #888;
+    }
+    #feedback {
+      font-size: 1.5rem;
+      margin-top: 1.5rem;
+      min-height: 2rem;
+    }
+    #feedback.correct { color: #1a7f37; }
+    #feedback.wrong { color: #d1242f; }
+    #next {
+      font-size: 1.2rem;
+      padding: 0.6rem 2rem;
+      margin-top: 1rem;
+      border: none;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+    }
+    #next[hidden] { display: none; }
+  </style>
+</head>
+<body>
+  <p id="prompt"></p>
+  <div id="choices">
+    <button id="left" class="choice"></button>
+    <span id="vs">vs</span>
+    <button id="right" class="choice"></button>
+  </div>
+  <p id="feedback"></p>
+  <button id="next" hidden>다음 문제</button>
+  <script type="module" src="game.js"></script>
+</body>
+</html>
