@@ -15,6 +15,26 @@
       margin: 0;
       background: #f5f7fb;
     }
+    #hud {
+      width: 18rem;
+      margin-bottom: 1.5rem;
+    }
+    #hearts {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    #timer-bar {
+      height: 0.7rem;
+      border-radius: 6px;
+      background: #d9dee8;
+      overflow: hidden;
+    }
+    #timer-fill {
+      height: 100%;
+      width: 100%;
+      background: #2563eb;
+      border-radius: 6px;
+    }
     #prompt {
       font-size: 1.3rem;
       margin-bottom: 1.5rem;
@@ -59,9 +79,31 @@
       cursor: pointer;
     }
     #next[hidden] { display: none; }
+    #gameover {
+      text-align: center;
+      margin-top: 1rem;
+    }
+    #gameover[hidden] { display: none; }
+    #gameover p {
+      font-size: 1.8rem;
+      margin: 0 0 0.8rem;
+    }
+    #restart {
+      font-size: 1.2rem;
+      padding: 0.6rem 2rem;
+      border: none;
+      border-radius: 8px;
+      background: #d1242f;
+      color: white;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
+  <div id="hud">
+    <div id="hearts"></div>
+    <div id="timer-bar"><div id="timer-fill"></div></div>
+  </div>
   <p id="prompt"></p>
   <div id="choices">
     <button id="left" class="choice"></button>
@@ -70,6 +112,10 @@
   </div>
   <p id="feedback"></p>
   <button id="next" hidden>다음 문제</button>
+  <div id="gameover" hidden>
+    <p>💀 게임 오버</p>
+    <button id="restart">다시 시작</button>
+  </div>
   <script type="module" src="game.js"></script>
 </body>
 </html>
