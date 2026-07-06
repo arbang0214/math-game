@@ -1,6 +1,7 @@
 // game-core.js 단위 테스트 — 실행: node test-game-core.js
 import {
-  createGame, answer, next, tick, MAX_HEARTS, TIME_LIMIT_MS,
+  createGame, answer, next, tick, comboMultiplier,
+  MAX_HEARTS, TIME_LIMIT_MS, BASE_SCORE, COMBO_STEP, MAX_MULTIPLIER,
 } from './game-core.js';
 import { checkAnswer } from './problems.js';
 
@@ -166,6 +167,117 @@ test('gameover 단계에서 answer·next를 부르면 에러', () => {
       threw = true;
     }
     assert(threw, 'gameover에서는 에러가 나야 함');
+  }
+});
+
+console.log('점수·콤보 (결정적)');
+test('처음 상태는 점수 0, 콤보 0', () => {
+  const s = createGame(fakeRng([0, 0, 0, 0]));
+  assert(s.score === 0, `점수가 0이 아님: ${s.score}`);
+  assert(s.combo === 0, `콤보가 0이 아님: ${s.combo}`);
+});
+test('comboMultiplier 경계값: 3연속마다 +1, 최대 4배', () => {
+  const cases = [[0, 1], [1, 1], [2, 1], [3, 2], [5, 2], [6, 3], [8, 3], [9, 4], [30, 4]];
+  for (const [combo, mult] of cases) {
+    assert(
+      comboMultiplier(combo) === mult,
+      `콤보 ${combo}의 배율이 ${mult}이 아님: ${comboMultiplier(combo)}`,
+    );
+  }
+});
+test('정답이면 콤보 +1, 기본 점수 획득', () => {
+  const s = createGame(fakeRng([0, 0, 0, 0])); // 답 left
+  const after = answer(s, 'left');
+  assert(after.combo === 1, `콤보가 1이 아님: ${after.combo}`);
+  assert(after.score === BASE_SCORE, `점수가 ${BASE_SCORE}이 아님: ${after.score}`);
+  assert(after.lastGain === BASE_SCORE, `lastGain이 ${BASE_SCORE}이 아님: ${after.lastGain}`);
+});
+test('3연속 정답이면 세 번째부터 배율 2배 (10+10+20=40)', () => {
+  let s = createGame(fakeRng([0, 0, 0, 0]));
+  for (let i = 0; i < COMBO_STEP; i++) {
+    s = answer(s, s.problem.answer);
+    if (i < COMBO_STEP - 1) s = next(s, fakeRng([0, 0, 0, 0]));
+  }
+  assert(s.combo === 3, `콤보가 3이 아님: ${s.combo}`);
+  assert(s.lastGain === BASE_SCORE * 2, `세 번째 획득이 2배가 아님: ${s.lastGain}`);
+  assert(s.score === BASE_SCORE * 4, `누적 점수가 40이 아님: ${s.score}`);
+});
+test('오답이면 콤보만 0으로 리셋되고 점수는 유지된다', () => {
+  let s = createGame(fakeRng([0, 0, 0, 0]));
+  s = answer(s, s.problem.answer); // 정답 → 10점, 콤보 1
+  s = next(s, fakeRng([0, 0, 0, 0]));
+  const wrong = s.problem.answer === 'left' ? 'right' : 'left';
+  s = answer(s, wrong);
+  assert(s.combo === 0, `콤보가 리셋 안 됨: ${s.combo}`);
+  assert(s.score === BASE_SCORE, `점수가 깎이면 안 됨: ${s.score}`);
+  assert(s.lastGain === 0, `오답의 lastGain은 0이어야 함: ${s.lastGain}`);
+});
+test('시간 초과도 콤보를 리셋하고 점수는 유지한다', () => {
+  let s = createGame(fakeRng([0, 0, 0, 0]));
+  s = answer(s, s.problem.answer);
+  s = next(s, fakeRng([0, 0, 0, 0]));
+  s = tick(s, TIME_LIMIT_MS);
+  assert(s.combo === 0, `콤보가 리셋 안 됨: ${s.combo}`);
+  assert(s.score === BASE_SCORE, `점수가 깎이면 안 됨: ${s.score}`);
+  assert(s.lastGain === 0, `시간 초과의 lastGain은 0이어야 함: ${s.lastGain}`);
+});
+test('next는 점수·콤보를 다음 문제로 이어간다', () => {
+  let s = createGame(fakeRng([0, 0, 0, 0]));
+  s = answer(s, s.problem.answer);
+  s = next(s, fakeRng([0.9, 0.9, 0.9, 0.9]));
+  assert(s.score === BASE_SCORE, `점수가 유지 안 됨: ${s.score}`);
+  assert(s.combo === 1, `콤보가 유지 안 됨: ${s.combo}`);
+});
+test('gameover가 되어도 점수는 남아 있다 (최고점 표시용)', () => {
+  let s = createGame(fakeRng([0, 0, 0, 0]));
+  s = answer(s, s.problem.answer); // 10점
+  s = next(s, fakeRng([0, 0, 0, 0]));
+  for (let i = 0; i < MAX_HEARTS; i++) {
+    const wrong = s.problem.answer === 'left' ? 'right' : 'left';
+    s = answer(s, wrong);
+    if (s.phase === 'feedback') s = next(s, fakeRng([0, 0, 0, 0]));
+  }
+  assert(s.phase === 'gameover', `준비 실패: ${s.phase}`);
+  assert(s.score === BASE_SCORE, `게임오버 후 점수가 사라짐: ${s.score}`);
+});
+
+console.log('점수·콤보 (무작위 500회 속성 검사)');
+test('무작위 플레이에서 점수·콤보가 기대 계산과 항상 일치한다', () => {
+  let s = createGame();
+  let expScore = 0;
+  let expCombo = 0;
+  for (let i = 0; i < 500; i++) {
+    if (Math.random() < 0.2) {
+      while (s.phase === 'question') s = tick(s, 1000 + Math.floor(Math.random() * 4000));
+      expCombo = 0;
+    } else {
+      const choice = Math.random() < 0.5 ? 'left' : 'right';
+      const correct = checkAnswer(s.problem, choice);
+      s = answer(s, choice);
+      if (correct) {
+        expCombo += 1;
+        expScore += BASE_SCORE * comboMultiplier(expCombo);
+      } else {
+        expCombo = 0;
+      }
+    }
+    assert(s.combo === expCombo, `${i}번째: 콤보 불일치 (기대 ${expCombo}, 실제 ${s.combo})`);
+    assert(s.score === expScore, `${i}번째: 점수 불일치 (기대 ${expScore}, 실제 ${s.score})`);
+    assert(
+      Number.isInteger(s.score) && s.score >= 0,
+      `${i}번째: 점수가 0 이상 정수가 아님 (${s.score})`,
+    );
+    assert(
+      s.lastGain <= BASE_SCORE * MAX_MULTIPLIER,
+      `${i}번째: 획득 점수가 상한 초과 (${s.lastGain})`,
+    );
+    if (s.phase === 'gameover') {
+      s = createGame();
+      expScore = 0;
+      expCombo = 0;
+    } else {
+      s = next(s);
+    }
   }
 });
 

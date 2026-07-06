@@ -19,9 +19,19 @@
       width: 18rem;
       margin-bottom: 1.5rem;
     }
+    #hud-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
     #hearts {
       font-size: 1.5rem;
-      margin-bottom: 0.5rem;
+    }
+    #score {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #1f2937;
     }
     #timer-bar {
       height: 0.7rem;
@@ -88,6 +98,10 @@
       font-size: 1.8rem;
       margin: 0 0 0.8rem;
     }
+    #gameover #final-score {
+      font-size: 1.2rem;
+      color: #374151;
+    }
     #restart {
       font-size: 1.2rem;
       padding: 0.6rem 2rem;
@@ -101,7 +115,10 @@
 </head>
 <body>
   <div id="hud">
-    <div id="hearts"></div>
+    <div id="hud-top">
+      <span id="hearts"></span>
+      <span id="score"></span>
+    </div>
     <div id="timer-bar"><div id="timer-fill"></div></div>
   </div>
   <p id="prompt"></p>
@@ -114,6 +131,7 @@
   <button id="next" hidden>다음 문제</button>
   <div id="gameover" hidden>
     <p>💀 게임 오버</p>
+    <p id="final-score"></p>
     <button id="restart">다시 시작</button>
   </div>
   <script type="module" src="game.js"></script>
