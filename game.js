@@ -19,6 +19,9 @@ const nextBtn = document.getElementById('next');
 const gameoverEl = document.getElementById('gameover');
 const restartBtn = document.getElementById('restart');
 
+const gameEl = document.getElementById('game');
+const mascotEl = document.getElementById('mascot');
+
 // 최고점: localStorage (사생활 보호 모드 등에서 막혀 있으면 이번 세션만 기억)
 const BEST_KEY = 'math-game.best';
 function loadBest() {
@@ -42,16 +45,49 @@ let isNewBest = false;
 
 // 상태 교체 지점을 한 곳으로 모아 gameover 진입 시에만 최고점을 갱신한다
 function update(newState) {
-  const wasOver = state.phase === 'gameover';
+  const prevState = state;
   state = newState;
-  if (!wasOver && state.phase === 'gameover') {
+  if (prevState.phase !== 'gameover' && state.phase === 'gameover') {
     isNewBest = state.score > best;
     if (isNewBest) {
       best = state.score;
       saveBest(best);
     }
   }
+  playEffects(prevState, state);
   render();
+}
+
+// 같은 연출을 연달아 틀 수 있도록 클래스를 뗐다 붙인다 (리플로우로 재시작)
+function playOnce(el, className) {
+  el.classList.remove(className);
+  void el.offsetWidth;
+  el.classList.add(className);
+}
+
+function spawnFloatingScore(gain) {
+  const el = document.createElement('span');
+  el.className = 'float-score';
+  el.textContent = `+${gain}`;
+  gameEl.appendChild(el);
+  el.addEventListener('animationend', () => el.remove());
+}
+
+// question → feedback/gameover 전이 순간에만 트는 일회성 연출
+function playEffects(prev, cur) {
+  if (prev.phase !== 'question' || cur.phase === 'question') return;
+  if (cur.lastResult === 'correct') {
+    playOnce(mascotEl, 'jump');
+    spawnFloatingScore(cur.lastGain);
+    const picked = choicesEl.querySelector(`[data-choice="${lastChoice}"]`);
+    if (picked) playOnce(picked, 'pop');
+  } else {
+    playOnce(gameEl, 'shake');
+    playOnce(mascotEl, 'wobble');
+  }
+  if (comboMultiplier(cur.combo) > comboMultiplier(prev.combo)) {
+    playOnce(scoreEl, 'pulse');
+  }
 }
 
 // 문자열 속 "3/5"를 세로 분수 마크업(.frac)으로 바꿔 el 안에 그린다
@@ -105,13 +141,20 @@ function renderChoices(problem) {
 // render는 타이머 때문에 매 프레임 불리므로, 버튼은 문제가 바뀔 때만 다시 만든다
 let renderedProblem = null;
 
+// 직전에 고른 보기 — 결과 공개 때 .picked 표시용 (UI 전용 상태)
+let lastChoice = null;
+
 function render() {
   heartsEl.textContent =
     '❤'.repeat(state.hearts) + '🤍'.repeat(MAX_HEARTS - state.hearts);
   const mult = comboMultiplier(state.combo);
   scoreEl.textContent =
     `⭐ ${state.score}` + (mult > 1 ? ` 🔥x${mult}` : '');
-  timerFillEl.style.width = `${(state.timeLeftMs / TIME_LIMIT_MS) * 100}%`;
+  const ratio = state.timeLeftMs / TIME_LIMIT_MS;
+  timerFillEl.style.width = `${ratio * 100}%`;
+  timerFillEl.classList.toggle('warn', ratio <= 0.6 && ratio > 0.3);
+  timerFillEl.classList.toggle('danger', ratio <= 0.3);
+  mascotEl.classList.toggle('urgent', state.phase === 'question' && ratio <= 0.3);
 
   if (state.problem !== renderedProblem) {
     renderedProblem = state.problem;
@@ -122,15 +165,34 @@ function render() {
   }
 
   const answering = state.phase === 'question';
+  const showResult = !answering;
   for (const btn of choicesEl.querySelectorAll('button')) {
     btn.disabled = !answering;
+    btn.classList.toggle(
+      'is-answer',
+      showResult && btn.dataset.choice === String(state.problem.answer),
+    );
+    btn.classList.toggle(
+      'picked',
+      showResult && lastChoice !== null && btn.dataset.choice === lastChoice,
+    );
   }
   nextBtn.hidden = state.phase !== 'feedback';
   gameoverEl.hidden = state.phase !== 'gameover';
   if (state.phase === 'gameover') {
+    gameoverEl.classList.toggle('newbest', isNewBest);
     finalScoreEl.textContent = isNewBest
       ? `🎉 신기록! ${state.score}점`
       : `점수 ${state.score}점 · 최고점 ${best}점`;
+  }
+
+  // 토끼 표정: 문제 중엔 기본, 정답·신기록은 웃음, 그 외 결과는 어질어질
+  if (state.phase === 'question') {
+    mascotEl.dataset.face = 'idle';
+  } else if (state.lastResult === 'correct' || (state.phase === 'gameover' && isNewBest)) {
+    mascotEl.dataset.face = 'happy';
+  } else {
+    mascotEl.dataset.face = 'dizzy';
   }
 
   if (state.phase === 'feedback' || state.phase === 'gameover') {
@@ -151,12 +213,15 @@ choicesEl.addEventListener('click', (e) => {
   const btn = e.target.closest('button[data-choice]');
   if (!btn || state.phase !== 'question') return;
   const choice = btn.dataset.choice;
+  lastChoice = choice;
   update(answer(state, state.problem.type === 'compare' ? choice : Number(choice)));
 });
 nextBtn.addEventListener('click', () => {
+  lastChoice = null;
   update(next(state));
 });
 restartBtn.addEventListener('click', () => {
+  lastChoice = null;
   update(createGame());
 });
 
