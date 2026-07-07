@@ -45,8 +45,8 @@
 
 ## 현재 상태 / 미결사항
 
-- 빌드 5단계(문제 유형 확장) 완료 — 테스트 66개 통과(31+27+8). 6단계(레벨/난이도
-  곡선) 착수 전. 스펙: `docs/specs/problem-types.md`
+- 빌드 6단계(레벨/난이도 곡선) 완료 — 테스트 76개 통과(36+32+8). 7단계(GitHub
+  Pages 배포) 착수 전. 5단계 스펙: `docs/specs/problem-types.md`
 - 화면 디자인 개편(팝 카툰 테마 + 리본 토끼 마스코트) 완료 — 스펙:
   `docs/superpowers/specs/2026-07-07-visual-redesign-design.md`
 - 문제 유형 3종: `compare`(이지선다, answer `'left'|'right'`),
@@ -56,7 +56,10 @@
 - 점수 규칙: 정답당 `BASE_SCORE`(10) × 배율, 연속 정답 `COMBO_STEP`(3)개마다
   배율 +1, 상한 `MAX_MULTIPLIER`(4). 오답/시간초과 시 콤보만 리셋, 점수 유지
 - 최고점은 localStorage 키 `math-game.best` — 저장/읽기는 game.js에만 있음
-- 제한시간은 유형과 무관하게 10초 고정 (`TIME_LIMIT_MS`) — 레벨별 단축,
-  유형별 시간/배점 차등, 유형 혼합 비율(현재 균등 1/3)은 6단계에서
+- 레벨: 점수 `LEVEL_SCORE_STEP`(100)마다 +1. 제한시간은 레벨당
+  `TIME_STEP_MS`(0.5초)씩 감소, 하한 `TIME_MIN_MS`(6초) — UI는 상수가 아니라
+  `state.timeLimitMs`를 읽는다. 유형 혼합 비율·분모/배수 범위도 레벨을 따름
+  (problems.js의 `*ForLevel` 함수들, 생성기 시그니처는 `(level, rng)`)
+- 유형별 시간/배점 차등은 **미결** (6단계 범위에서 의도적으로 제외)
 - 전체 리더보드는 서버가 필요하며 **아직 설계되지 않음** — 관련 코드를
   미리 만들거나 구조를 가정하지 말 것. MVP는 localStorage 최고점만 사용

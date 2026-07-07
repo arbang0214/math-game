@@ -45,12 +45,35 @@ function pick(rng, arr) {
   return arr[Math.floor(rng() * arr.length)];
 }
 
-const DENOMINATORS = [2, 3, 4, 5, 6, 8];
+// ---------- 레벨별 난이도 파라미터 (6단계) ----------
+// 레벨은 game-core가 점수에서 계산해 넘긴다. 여기서는 레벨에 따라
+// 유형 혼합 비율과 수 범위만 달라진다.
+
+// 유형 혼합 가중치: 저레벨은 비교 위주, 레벨이 오르면 연산·약분 비중이 커진다
+export function typeWeightsForLevel(level) {
+  if (level <= 2) return { compare: 0.5, arithmetic: 0.25, equivalent: 0.25 };
+  if (level <= 4) return { compare: 1 / 3, arithmetic: 1 / 3, equivalent: 1 / 3 };
+  return { compare: 0.2, arithmetic: 0.4, equivalent: 0.4 };
+}
+
+// 분모 후보 (compare·분수 연산): 레벨이 오르면 큰 분모가 섞인다
+export function denominatorsForLevel(level) {
+  if (level >= 7) return [2, 3, 4, 5, 6, 8, 9, 10, 12];
+  if (level >= 4) return [2, 3, 4, 5, 6, 8, 9, 10];
+  return [2, 3, 4, 5, 6, 8];
+}
+
+// 약분/통분 배수 후보: 레벨이 오르면 큰 배수가 섞인다
+export function multipliersForLevel(level) {
+  if (level >= 7) return [2, 3, 4, 5, 6];
+  if (level >= 4) return [2, 3, 4, 5];
+  return [2, 3, 4];
+}
 
 // 크기 비교 문제: 분수 vs 소수, 값이 같은 경우는 내지 않는다.
 // 두 값의 차이가 0.25 이하가 되도록 골라 눈대중으로 못 맞히게 한다.
-export function makeComparisonProblem(rng = Math.random) {
-  const den = pick(rng, DENOMINATORS);
+export function makeComparisonProblem(level = 1, rng = Math.random) {
+  const den = pick(rng, denominatorsForLevel(level));
   const num = randInt(rng, 1, den - 1);
   const fraction = makeFraction(num, den);
 
@@ -117,19 +140,20 @@ function buildChoices(rng, answerValue, candidates, fallback) {
 const ARITHMETIC_VARIANTS = ['frac-add', 'frac-sub', 'dec-add', 'dec-sub'];
 
 // 연산 문제. rng 호출 순서: ① 변형 → 이후는 변형별 생성기 주석 참조
-export function makeArithmeticProblem(rng = Math.random) {
+export function makeArithmeticProblem(level = 1, rng = Math.random) {
   const variant = pick(rng, ARITHMETIC_VARIANTS);
   return variant.startsWith('frac')
-    ? makeFractionArithmetic(rng, variant)
-    : makeDecimalArithmetic(rng, variant);
+    ? makeFractionArithmetic(level, rng, variant)
+    : makeDecimalArithmetic(rng, variant); // 소수 변형은 tenths 1~9 고정 — 레벨 무관
 }
 
 // 분모가 다른 진분수끼리의 덧셈/뺄셈. 결과는 항상 0 < 값 < 1의 기약분수.
 // rng 호출 순서: ① 분모 b ② 분모 d ③ 분자 a ④ 분자 c ⑤ 정답 위치
-function makeFractionArithmetic(rng, variant) {
+function makeFractionArithmetic(level, rng, variant) {
   const isAdd = variant === 'frac-add';
-  const b = pick(rng, DENOMINATORS);
-  const d = pick(rng, DENOMINATORS.filter((x) => x !== b));
+  const dens = denominatorsForLevel(level);
+  const b = pick(rng, dens);
+  const d = pick(rng, dens.filter((x) => x !== b));
 
   // 결과가 진분수(덧셈)/양수(뺄셈)가 되도록 유효한 분자만 열거해서 뽑는다 (재추출 없음)
   const aCands = [];
@@ -203,7 +227,6 @@ function makeDecimalArithmetic(rng, variant) {
 // ---------- equivalent: 약분/통분 (사지선다) ----------
 
 const EQUIVALENT_VARIANTS = ['simplify', 'expand'];
-const EQUIVALENT_MULTIPLIERS = [2, 3, 4];
 
 // 재료가 되는 기약분수 후보: d ∈ {2,3,4,5}, 1 ≤ n < d, gcd(n,d) = 1
 const BASE_FRACTIONS = [];
@@ -215,10 +238,10 @@ for (const d of [2, 3, 4, 5]) {
 
 // 약분(기약분수 만들기)/통분(동치 분수 찾기) 문제.
 // rng 호출 순서: ① 변형 ② 기약분수 n/d ③ 배수 k ④ 정답 위치
-export function makeEquivalentProblem(rng = Math.random) {
+export function makeEquivalentProblem(level = 1, rng = Math.random) {
   const variant = pick(rng, EQUIVALENT_VARIANTS);
   const [n, d] = pick(rng, BASE_FRACTIONS);
-  const k = pick(rng, EQUIVALENT_MULTIPLIERS);
+  const k = pick(rng, multipliersForLevel(level));
 
   // 오답은 모두 기준 분수와 값이 달라야 한다 ("정답이 둘"이 되면 안 됨) —
   // buildChoices가 정답값과 같은 후보를 걸러 이를 보장한다.
@@ -268,12 +291,11 @@ export function makeEquivalentProblem(rng = Math.random) {
 
 // ---------- 최상위 진입점 ----------
 
-const PROBLEM_TYPES = ['compare', 'arithmetic', 'equivalent'];
-
-// 매 문제의 유형을 고른다. rng 호출 순서: ① 유형(균등 1/3) → 이후 각 생성기에 위임
-export function makeProblem(rng = Math.random) {
-  const type = pick(rng, PROBLEM_TYPES);
-  if (type === 'compare') return makeComparisonProblem(rng);
-  if (type === 'arithmetic') return makeArithmeticProblem(rng);
-  return makeEquivalentProblem(rng);
+// 매 문제의 유형을 고른다. rng 호출 순서: ① 유형(레벨별 가중치, 누적 비교) → 이후 각 생성기에 위임
+export function makeProblem(level = 1, rng = Math.random) {
+  const w = typeWeightsForLevel(level);
+  const r = rng();
+  if (r < w.compare) return makeComparisonProblem(level, rng);
+  if (r < w.compare + w.arithmetic) return makeArithmeticProblem(level, rng);
+  return makeEquivalentProblem(level, rng);
 }

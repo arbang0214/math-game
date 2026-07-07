@@ -57,14 +57,25 @@ body {
 #hud {
   width: 100%;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 0.5rem;
   margin-bottom: 0.5rem;
 }
 #hearts {
   font-size: 1.4rem;
   letter-spacing: 2px;
+  margin-right: auto; /* 레벨·점수 칩을 오른쪽으로 민다 */
 }
+#level {
+  background: #fff;
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #2a6bb0;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.1);
+}
+#level.pulse { animation: pulse 0.4s ease; }
 #score {
   background: #fff;
   border-radius: 999px;
@@ -364,6 +375,12 @@ body {
   color: var(--green-deep);
   pointer-events: none;
   animation: float-up 0.9s ease forwards;
+}
+/* 레벨업 텍스트: 플로팅 점수와 같은 연출, 색·위치만 다르게 */
+.float-score.float-level {
+  top: 22%;
+  font-size: 1.6rem;
+  color: #2a6bb0;
 }
 
 /* 큰 모션이 부담스러운 사용자 배려 */

@@ -1,13 +1,14 @@
-// 게임 루프 UI (빌드 5단계) — game-core.js의 상태를 DOM에 그린다.
+// 게임 루프 UI (빌드 6단계) — game-core.js의 상태를 DOM에 그린다.
 // 게임 규칙은 전부 game-core.js에 있고, 이 파일은 그리기·클릭 연결·실제 시계·최고점 저장만 한다.
 
 import {
-  createGame, answer, next, tick, comboMultiplier, MAX_HEARTS, TIME_LIMIT_MS,
+  createGame, answer, next, tick, comboMultiplier, MAX_HEARTS,
 } from './game-core.js';
 import { answerText } from './problems.js';
 import { fractionSegments } from './format.js';
 
 const heartsEl = document.getElementById('hearts');
+const levelEl = document.getElementById('level');
 const scoreEl = document.getElementById('score');
 const finalScoreEl = document.getElementById('final-score');
 const timerFillEl = document.getElementById('timer-fill');
@@ -68,22 +69,28 @@ function playOnce(el, className) {
   el.classList.add(className);
 }
 
-function spawnFloatingScore(gain) {
+// 떠오르며 사라지는 일회성 텍스트 (+점수, LEVEL UP 등)
+function spawnFloating(text, className) {
   // 모션 최소화 설정에선 애니메이션이 돌지 않아 animationend가 오지 않는다 — 아예 만들지 않는다
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const el = document.createElement('span');
-  el.className = 'float-score';
-  el.textContent = `+${gain}`;
+  el.className = className;
+  el.textContent = text;
   gameEl.appendChild(el);
   el.addEventListener('animationend', () => el.remove());
 }
 
-// question → feedback/gameover 전이 순간에만 트는 일회성 연출
+// 상태 전이 순간에만 트는 일회성 연출
 function playEffects(prev, cur) {
+  // 새 문제로 넘어오면서 레벨이 올랐으면 레벨업 연출
+  if (cur.phase === 'question' && prev.level !== undefined && cur.level > prev.level) {
+    playOnce(levelEl, 'pulse');
+    spawnFloating(`LEVEL UP! Lv.${cur.level}`, 'float-score float-level');
+  }
   if (prev.phase !== 'question' || cur.phase === 'question') return;
   if (cur.lastResult === 'correct') {
     playOnce(mascotEl, 'jump');
-    spawnFloatingScore(cur.lastGain);
+    spawnFloating(`+${cur.lastGain}`, 'float-score');
     const picked = choicesEl.querySelector(`[data-choice="${lastChoice}"]`);
     if (picked) playOnce(picked, 'pop');
   } else if (cur.phase === 'gameover' && isNewBest) {
@@ -152,10 +159,12 @@ let renderedProblem = null;
 function render() {
   heartsEl.textContent =
     '❤'.repeat(state.hearts) + '🤍'.repeat(MAX_HEARTS - state.hearts);
+  levelEl.textContent = `Lv.${state.level}`;
   const mult = comboMultiplier(state.combo);
   scoreEl.textContent =
     `⭐ ${state.score}` + (mult > 1 ? ` 🔥x${mult}` : '');
-  const ratio = state.timeLeftMs / TIME_LIMIT_MS;
+  // 제한시간은 레벨마다 다르므로 상수가 아니라 상태에서 읽는다
+  const ratio = state.timeLeftMs / state.timeLimitMs;
   timerFillEl.style.width = `${ratio * 100}%`;
   timerFillEl.classList.toggle('warn', ratio <= 0.6 && ratio > 0.3);
   timerFillEl.classList.toggle('danger', ratio <= 0.3);
