@@ -168,7 +168,10 @@ function render() {
   timerFillEl.style.width = `${ratio * 100}%`;
   timerFillEl.classList.toggle('warn', ratio <= 0.6 && ratio > 0.3);
   timerFillEl.classList.toggle('danger', ratio <= 0.3);
-  mascotEl.classList.toggle('urgent', state.phase === 'question' && ratio <= 0.3);
+  // 토끼 초조 단계는 타이머 바 색 단계(warn/danger)와 같은 경계를 쓴다
+  const inQuestion = state.phase === 'question';
+  mascotEl.classList.toggle('nervous', inQuestion && ratio <= 0.6 && ratio > 0.3);
+  mascotEl.classList.toggle('urgent', inQuestion && ratio <= 0.3);
 
   if (state.problem !== renderedProblem) {
     renderedProblem = state.problem;
@@ -202,7 +205,8 @@ function render() {
 
   // 토끼 표정: 문제 중엔 기본, 정답·신기록은 웃음, 그 외 결과는 어질어질
   if (state.phase === 'question') {
-    mascotEl.dataset.face = 'idle';
+    // 시간이 얼마 안 남으면(노란불부터) 초조한 표정
+    mascotEl.dataset.face = ratio <= 0.6 ? 'worried' : 'idle';
   } else if (state.lastResult === 'correct' || (state.phase === 'gameover' && isNewBest)) {
     mascotEl.dataset.face = 'happy';
   } else {
