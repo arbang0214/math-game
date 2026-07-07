@@ -123,7 +123,7 @@ body {
 #mascot { width: 7rem; flex-shrink: 0; }
 #mascot svg { display: block; width: 100%; }
 
-/* 표정 3종은 SVG에 겹쳐 있고 data-face로 하나만 보인다 */
+/* 표정 4종은 SVG에 겹쳐 있고 data-face로 하나만 보인다 */
 #mascot .face { display: none; }
 #mascot[data-face="idle"] .face-idle,
 #mascot[data-face="happy"] .face-happy,
