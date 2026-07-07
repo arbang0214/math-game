@@ -4,147 +4,79 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>분수/소수 타임어택</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      background: #f5f7fb;
-    }
-    #hud {
-      width: 18rem;
-      margin-bottom: 1.5rem;
-    }
-    #hud-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.5rem;
-    }
-    #hearts {
-      font-size: 1.5rem;
-    }
-    #score {
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: #1f2937;
-    }
-    #timer-bar {
-      height: 0.7rem;
-      border-radius: 6px;
-      background: #d9dee8;
-      overflow: hidden;
-    }
-    #timer-fill {
-      height: 100%;
-      width: 100%;
-      background: #2563eb;
-      border-radius: 6px;
-    }
-    #prompt {
-      font-size: 1.3rem;
-      margin-bottom: 1rem;
-    }
-    #question {
-      font-size: 2.2rem;
-      font-weight: bold;
-      margin: 0 0 1.5rem;
-    }
-    #question[hidden] { display: none; }
-    #choices {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    /* 사지선다: 2×2 그리드, 표기가 길어지므로 폰트를 한 단계 줄인다 */
-    #choices.quad {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-    }
-    #choices.quad .choice {
-      font-size: 1.8rem;
-    }
-    .choice {
-      font-size: 2.5rem;
-      padding: 1.2rem 2rem;
-      min-width: 7rem;
-      border: 2px solid #444;
-      border-radius: 12px;
-      background: white;
-      cursor: pointer;
-    }
-    .choice:disabled {
-      cursor: default;
-      opacity: 0.6;
-    }
-    #vs {
-      font-size: 1.5rem;
-      color: #888;
-    }
-    #feedback {
-      font-size: 1.5rem;
-      margin-top: 1.5rem;
-      min-height: 2rem;
-    }
-    #feedback.correct { color: #1a7f37; }
-    #feedback.wrong { color: #d1242f; }
-    #next {
-      font-size: 1.2rem;
-      padding: 0.6rem 2rem;
-      margin-top: 1rem;
-      border: none;
-      border-radius: 8px;
-      background: #2563eb;
-      color: white;
-      cursor: pointer;
-    }
-    #next[hidden] { display: none; }
-    #gameover {
-      text-align: center;
-      margin-top: 1rem;
-    }
-    #gameover[hidden] { display: none; }
-    #gameover p {
-      font-size: 1.8rem;
-      margin: 0 0 0.8rem;
-    }
-    #gameover #final-score {
-      font-size: 1.2rem;
-      color: #374151;
-    }
-    #restart {
-      font-size: 1.2rem;
-      padding: 0.6rem 2rem;
-      border: none;
-      border-radius: 8px;
-      background: #d1242f;
-      color: white;
-      cursor: pointer;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="hud">
-    <div id="hud-top">
+  <main id="game">
+    <div id="hud">
       <span id="hearts"></span>
       <span id="score"></span>
     </div>
     <div id="timer-bar"><div id="timer-fill"></div></div>
-  </div>
-  <p id="prompt"></p>
-  <p id="question" hidden></p>
-  <div id="choices"><!-- 보기 버튼은 game.js가 문제 유형에 맞춰 그린다 --></div>
-  <p id="feedback"></p>
-  <button id="next" hidden>다음 문제</button>
-  <div id="gameover" hidden>
-    <p>💀 게임 오버</p>
-    <p id="final-score"></p>
-    <button id="restart">다시 시작</button>
-  </div>
+
+    <div id="stage">
+      <!-- 리본 토끼 마스코트 — 표정 3종(.face-*)을 겹쳐 두고 data-face로 전환 -->
+      <div id="mascot" data-face="idle">
+        <svg viewBox="0 0 100 112" aria-hidden="true">
+          <!-- 귀: 왼쪽 쫑긋, 오른쪽 살짝 접힘 -->
+          <g transform="rotate(-6 38 26)">
+            <ellipse cx="38" cy="26" rx="9.5" ry="23" fill="#ffffff"/>
+            <ellipse cx="38" cy="29" rx="5" ry="15" fill="#ffd3e0"/>
+          </g>
+          <g transform="rotate(14 63 28)">
+            <ellipse cx="63" cy="28" rx="9.5" ry="22" fill="#ffffff"/>
+            <ellipse cx="63" cy="31" rx="5" ry="14" fill="#ffd3e0"/>
+          </g>
+          <!-- 몸통(머리와 한 덩어리) -->
+          <ellipse cx="50" cy="74" rx="33" ry="31" fill="#ffffff"/>
+          <!-- 핑크 리본 (오른쪽 귀 밑) -->
+          <g transform="rotate(10 68 46)">
+            <path d="M68 46 L57 40 Q54 46 57 52 Z" fill="#ff6b9d"/>
+            <path d="M68 46 L79 40 Q82 46 79 52 Z" fill="#ff6b9d"/>
+            <circle cx="68" cy="46" r="4" fill="#ff4f8b"/>
+          </g>
+          <!-- 코와 볼은 모든 표정 공통 -->
+          <ellipse cx="50" cy="76" rx="2.2" ry="1.7" fill="#ff8fab"/>
+          <ellipse cx="30" cy="77" rx="5" ry="3.6" fill="#ffc2d4" opacity="0.8"/>
+          <ellipse cx="70" cy="77" rx="5" ry="3.6" fill="#ffc2d4" opacity="0.8"/>
+          <!-- 표정: 기본 (점 눈 + ω 입) -->
+          <g class="face face-idle">
+            <circle cx="39" cy="70" r="3.4" fill="#4a4a4a"/>
+            <circle cx="61" cy="70" r="3.4" fill="#4a4a4a"/>
+            <circle cx="40.2" cy="68.8" r="1.1" fill="#ffffff"/>
+            <circle cx="62.2" cy="68.8" r="1.1" fill="#ffffff"/>
+            <path d="M46 80 Q48 83 50 80 Q52 83 54 80" stroke="#4a4a4a" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </g>
+          <!-- 표정: 정답 (눈웃음 + 함박웃음) -->
+          <g class="face face-happy">
+            <path d="M34 70 Q39 64 44 70" stroke="#4a4a4a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+            <path d="M56 70 Q61 64 66 70" stroke="#4a4a4a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+            <path d="M43 80 Q50 88 57 80" stroke="#4a4a4a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+          </g>
+          <!-- 표정: 오답/시간초과 (X자 눈 + 벌어진 입) -->
+          <g class="face face-dizzy">
+            <path d="M35 66 L43 74 M43 66 L35 74" stroke="#4a4a4a" stroke-width="2.6" stroke-linecap="round"/>
+            <path d="M57 66 L65 74 M65 66 L57 74" stroke="#4a4a4a" stroke-width="2.6" stroke-linecap="round"/>
+            <ellipse cx="50" cy="82" rx="3.2" ry="4" fill="#4a4a4a"/>
+          </g>
+        </svg>
+      </div>
+      <div id="bubble"><p id="prompt"></p></div>
+    </div>
+
+    <p id="question" hidden></p>
+    <div id="choices"><!-- 보기 버튼은 game.js가 문제 유형에 맞춰 그린다 --></div>
+    <p id="feedback"></p>
+    <button id="next" hidden>다음 문제</button>
+
+    <div id="gameover" hidden>
+      <div class="panel">
+        <p class="title">게임 오버</p>
+        <p id="final-score"></p>
+        <button id="restart">다시 시작</button>
+      </div>
+    </div>
+  </main>
   <script type="module" src="game.js"></script>
 </body>
 </html>
