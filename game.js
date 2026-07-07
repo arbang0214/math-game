@@ -1,17 +1,18 @@
-// 게임 루프 UI (빌드 4단계) — game-core.js의 상태를 DOM에 그린다.
+// 게임 루프 UI (빌드 5단계) — game-core.js의 상태를 DOM에 그린다.
 // 게임 규칙은 전부 game-core.js에 있고, 이 파일은 그리기·클릭 연결·실제 시계·최고점 저장만 한다.
 
 import {
   createGame, answer, next, tick, comboMultiplier, MAX_HEARTS, TIME_LIMIT_MS,
 } from './game-core.js';
+import { answerText } from './problems.js';
 
 const heartsEl = document.getElementById('hearts');
 const scoreEl = document.getElementById('score');
 const finalScoreEl = document.getElementById('final-score');
 const timerFillEl = document.getElementById('timer-fill');
 const promptEl = document.getElementById('prompt');
-const leftBtn = document.getElementById('left');
-const rightBtn = document.getElementById('right');
+const questionEl = document.getElementById('question');
+const choicesEl = document.getElementById('choices');
 const feedbackEl = document.getElementById('feedback');
 const nextBtn = document.getElementById('next');
 const gameoverEl = document.getElementById('gameover');
@@ -52,6 +53,36 @@ function update(newState) {
   render();
 }
 
+function choiceButton(choiceKey, text) {
+  const btn = document.createElement('button');
+  btn.className = 'choice';
+  btn.dataset.choice = choiceKey;
+  btn.textContent = text;
+  return btn;
+}
+
+// 보기 버튼 만들기 — 이지선다(compare)는 2개 + vs, 사지선다는 2×2 그리드 4개
+function renderChoices(problem) {
+  choicesEl.textContent = '';
+  const isCompare = problem.type === 'compare';
+  choicesEl.classList.toggle('quad', !isCompare);
+  if (isCompare) {
+    const vs = document.createElement('span');
+    vs.id = 'vs';
+    vs.textContent = 'vs';
+    choicesEl.append(
+      choiceButton('left', problem.left.text),
+      vs,
+      choiceButton('right', problem.right.text),
+    );
+  } else {
+    problem.choices.forEach((c, i) => choicesEl.append(choiceButton(String(i), c.text)));
+  }
+}
+
+// render는 타이머 때문에 매 프레임 불리므로, 버튼은 문제가 바뀔 때만 다시 만든다
+let renderedProblem = null;
+
 function render() {
   heartsEl.textContent =
     '❤'.repeat(state.hearts) + '🖤'.repeat(MAX_HEARTS - state.hearts);
@@ -61,12 +92,17 @@ function render() {
   timerFillEl.style.width = `${(state.timeLeftMs / TIME_LIMIT_MS) * 100}%`;
 
   promptEl.textContent = state.problem.prompt;
-  leftBtn.textContent = state.problem.left.text;
-  rightBtn.textContent = state.problem.right.text;
+  questionEl.textContent = state.problem.question ?? '';
+  questionEl.hidden = !state.problem.question;
+  if (state.problem !== renderedProblem) {
+    renderedProblem = state.problem;
+    renderChoices(state.problem);
+  }
 
   const answering = state.phase === 'question';
-  leftBtn.disabled = !answering;
-  rightBtn.disabled = !answering;
+  for (const btn of choicesEl.querySelectorAll('button')) {
+    btn.disabled = !answering;
+  }
   nextBtn.hidden = state.phase !== 'feedback';
   gameoverEl.hidden = state.phase !== 'gameover';
   if (state.phase === 'gameover') {
@@ -76,13 +112,12 @@ function render() {
   }
 
   if (state.phase === 'feedback' || state.phase === 'gameover') {
-    const answerText = state.problem[state.problem.answer].text;
     if (state.lastResult === 'correct') {
       feedbackEl.textContent = `⭕ 정답! +${state.lastGain}`;
     } else if (state.lastResult === 'timeout') {
-      feedbackEl.textContent = `⏰ 시간 초과! 정답은 ${answerText}`;
+      feedbackEl.textContent = `⏰ 시간 초과! 정답은 ${answerText(state.problem)}`;
     } else {
-      feedbackEl.textContent = `❌ 오답! 정답은 ${answerText}`;
+      feedbackEl.textContent = `❌ 오답! 정답은 ${answerText(state.problem)}`;
     }
     feedbackEl.className = state.lastResult === 'correct' ? 'correct' : 'wrong';
   } else {
@@ -91,11 +126,12 @@ function render() {
   }
 }
 
-leftBtn.addEventListener('click', () => {
-  update(answer(state, 'left'));
-});
-rightBtn.addEventListener('click', () => {
-  update(answer(state, 'right'));
+// 보기 클릭은 컨테이너 위임 한 곳에서 처리 — 사지선다는 인덱스 숫자로 변환해 넘긴다
+choicesEl.addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-choice]');
+  if (!btn || state.phase !== 'question') return;
+  const choice = btn.dataset.choice;
+  update(answer(state, state.problem.type === 'compare' ? choice : Number(choice)));
 });
 nextBtn.addEventListener('click', () => {
   update(next(state));

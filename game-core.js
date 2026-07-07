@@ -1,5 +1,4 @@
-// 빌드 4단계: 점수+콤보
-// 게임 루프 상태 머신 (빌드 4단계: 점수 + 콤보)
+// 게임 루프 상태 머신 (빌드 5단계: 문제 유형 확장)
 // DOM 없음. 상태를 받아 새 상태를 돌려주는 순수 함수들 — Node에서 테스트 가능.
 // 실제 시계는 UI가 갖고, 여기서는 tick(state, elapsedMs)로 흐른 시간을 주입받는다.
 // 최고점 저장(localStorage)은 UI 몫 — 여기서는 score만 계산한다.
@@ -7,7 +6,7 @@
 // 상태 흐름: question --answer/시간초과--> feedback --next--> question ...
 //            하트가 0이 되면 feedback 대신 gameover (createGame으로만 재시작)
 
-import { makeComparisonProblem, checkAnswer } from './problems.js';
+import { makeProblem, checkAnswer } from './problems.js';
 
 export const MAX_HEARTS = 3;
 export const TIME_LIMIT_MS = 10000;
@@ -23,7 +22,7 @@ export function comboMultiplier(combo) {
 function newQuestion(rng) {
   return {
     phase: 'question',
-    problem: makeComparisonProblem(rng),
+    problem: makeProblem(rng),
     lastResult: null, // 'correct' | 'wrong' | 'timeout' — feedback/gameover에서만 값이 있다
     lastGain: 0, // 직전 답으로 얻은 점수 — feedback에서 "+20" 표시용
     timeLeftMs: TIME_LIMIT_MS,
@@ -47,7 +46,7 @@ function loseHeart(state, result) {
   };
 }
 
-// choice: 'left' | 'right'
+// choice: compare는 'left'|'right', 사지선다는 보기 인덱스 0~3 (problems.js 참조)
 export function answer(state, choice) {
   if (state.phase !== 'question') {
     throw new Error(`question 단계에서만 답할 수 있음 (현재: ${state.phase})`);

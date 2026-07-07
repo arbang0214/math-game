@@ -47,12 +47,26 @@
     }
     #prompt {
       font-size: 1.3rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
     }
+    #question {
+      font-size: 2.2rem;
+      font-weight: bold;
+      margin: 0 0 1.5rem;
+    }
+    #question[hidden] { display: none; }
     #choices {
       display: flex;
       align-items: center;
       gap: 1rem;
+    }
+    /* 사지선다: 2×2 그리드, 표기가 길어지므로 폰트를 한 단계 줄인다 */
+    #choices.quad {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+    }
+    #choices.quad .choice {
+      font-size: 1.8rem;
     }
     .choice {
       font-size: 2.5rem;
@@ -122,11 +136,8 @@
     <div id="timer-bar"><div id="timer-fill"></div></div>
   </div>
   <p id="prompt"></p>
-  <div id="choices">
-    <button id="left" class="choice"></button>
-    <span id="vs">vs</span>
-    <button id="right" class="choice"></button>
-  </div>
+  <p id="question" hidden></p>
+  <div id="choices"><!-- 보기 버튼은 game.js가 문제 유형에 맞춰 그린다 --></div>
   <p id="feedback"></p>
   <button id="next" hidden>다음 문제</button>
   <div id="gameover" hidden>
