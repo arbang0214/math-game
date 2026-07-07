@@ -33,7 +33,8 @@
 ## 기술 스택
 
 - 바닐라 HTML/CSS/JS — 빌드 도구 없음, 정적 파일로 완결
-- 배포: GitHub Pages (예정)
+- 배포: GitHub Pages — https://arbang0214.github.io/math-game/
+  (master 브랜치 root, push하면 1~2분 내 자동 반영)
 - 리더보드: 서버 필요 → 후순위 단계 (MVP는 localStorage 최고점만)
 
 ## 빌드 단계 (작은 단위, 한 겹씩)
@@ -44,5 +45,5 @@
 4. ✅ 점수 + 콤보 — 콤보 배율, localStorage 최고점
 5. ✅ 문제 유형 확장 — 연산(사지선다), 약분/통분 추가
 6. ✅ 레벨/난이도 곡선 — 레벨업마다 시간 단축·문제 어려워짐
-7. ⬜ 배포 — GitHub Pages 공개
+7. ✅ 배포 — GitHub Pages 공개: https://arbang0214.github.io/math-game/
 8. ⬜ 전체 리더보드 — 서버/DB 붙이기 (별도 설계)
