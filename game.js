@@ -66,6 +66,8 @@ function playOnce(el, className) {
 }
 
 function spawnFloatingScore(gain) {
+  // 모션 최소화 설정에선 애니메이션이 돌지 않아 animationend가 오지 않는다 — 아예 만들지 않는다
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const el = document.createElement('span');
   el.className = 'float-score';
   el.textContent = `+${gain}`;
