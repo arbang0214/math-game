@@ -5,6 +5,7 @@ import {
   createGame, answer, next, tick, comboMultiplier, MAX_HEARTS, TIME_LIMIT_MS,
 } from './game-core.js';
 import { answerText } from './problems.js';
+import { fractionSegments } from './format.js';
 
 const heartsEl = document.getElementById('hearts');
 const scoreEl = document.getElementById('score');
@@ -53,11 +54,32 @@ function update(newState) {
   render();
 }
 
+// 문자열 속 "3/5"를 세로 분수 마크업(.frac)으로 바꿔 el 안에 그린다
+function renderWithFractions(el, text) {
+  el.textContent = '';
+  for (const seg of fractionSegments(text)) {
+    if (seg.type === 'text') {
+      el.append(seg.text);
+      continue;
+    }
+    const frac = document.createElement('span');
+    frac.className = 'frac';
+    const num = document.createElement('span');
+    num.className = 'num';
+    num.textContent = seg.num;
+    const den = document.createElement('span');
+    den.className = 'den';
+    den.textContent = seg.den;
+    frac.append(num, den);
+    el.append(frac);
+  }
+}
+
 function choiceButton(choiceKey, text) {
   const btn = document.createElement('button');
   btn.className = 'choice';
   btn.dataset.choice = choiceKey;
-  btn.textContent = text;
+  renderWithFractions(btn, text);
   return btn;
 }
 
@@ -85,17 +107,17 @@ let renderedProblem = null;
 
 function render() {
   heartsEl.textContent =
-    '❤'.repeat(state.hearts) + '🖤'.repeat(MAX_HEARTS - state.hearts);
+    '❤'.repeat(state.hearts) + '🤍'.repeat(MAX_HEARTS - state.hearts);
   const mult = comboMultiplier(state.combo);
   scoreEl.textContent =
-    `점수: ${state.score}` + (mult > 1 ? ` 🔥x${mult}` : '');
+    `⭐ ${state.score}` + (mult > 1 ? ` 🔥x${mult}` : '');
   timerFillEl.style.width = `${(state.timeLeftMs / TIME_LIMIT_MS) * 100}%`;
 
-  promptEl.textContent = state.problem.prompt;
-  questionEl.textContent = state.problem.question ?? '';
-  questionEl.hidden = !state.problem.question;
   if (state.problem !== renderedProblem) {
     renderedProblem = state.problem;
+    promptEl.textContent = state.problem.prompt;
+    questionEl.hidden = !state.problem.question;
+    renderWithFractions(questionEl, state.problem.question ?? '');
     renderChoices(state.problem);
   }
 
@@ -112,13 +134,11 @@ function render() {
   }
 
   if (state.phase === 'feedback' || state.phase === 'gameover') {
-    if (state.lastResult === 'correct') {
-      feedbackEl.textContent = `⭕ 정답! +${state.lastGain}`;
-    } else if (state.lastResult === 'timeout') {
-      feedbackEl.textContent = `⏰ 시간 초과! 정답은 ${answerText(state.problem)}`;
-    } else {
-      feedbackEl.textContent = `❌ 오답! 정답은 ${answerText(state.problem)}`;
-    }
+    const msg =
+      state.lastResult === 'correct' ? `⭕ 정답! +${state.lastGain}`
+      : state.lastResult === 'timeout' ? `⏰ 시간 초과! 정답은 ${answerText(state.problem)}`
+      : `❌ 오답! 정답은 ${answerText(state.problem)}`;
+    renderWithFractions(feedbackEl, msg);
     feedbackEl.className = state.lastResult === 'correct' ? 'correct' : 'wrong';
   } else {
     feedbackEl.textContent = '';
