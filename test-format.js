@@ -72,5 +72,20 @@ test('무작위 문제 500개의 모든 표시 문자열: 세그먼트를 도로
   }
 });
 
+test('무작위 문제 500개: 분수 보기는 자기 분자·분모 그대로, 소수 보기는 텍스트 세그먼트 하나', () => {
+  for (let i = 0; i < 500; i++) {
+    const p = makeProblem();
+    const values = p.type === 'compare' ? [p.left, p.right] : p.choices;
+    for (const v of values) {
+      const segs = fractionSegments(v.text);
+      if (v.kind === 'fraction') {
+        assertSegments(segs, [{ type: 'fraction', num: v.num, den: v.den }]);
+      } else {
+        assertSegments(segs, [{ type: 'text', text: v.text }]);
+      }
+    }
+  }
+});
+
 console.log(`\nformat: ${pass}개 통과, ${fail}개 실패`);
 if (fail > 0) process.exit(1);

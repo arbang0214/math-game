@@ -43,6 +43,9 @@ let state = createGame();
 let best = loadBest();
 let isNewBest = false;
 
+// 직전에 고른 보기 — 결과 공개 때 .picked 표시용 (UI 전용 상태)
+let lastChoice = null;
+
 // 상태 교체 지점을 한 곳으로 모아 gameover 진입 시에만 최고점을 갱신한다
 function update(newState) {
   const prevState = state;
@@ -83,6 +86,9 @@ function playEffects(prev, cur) {
     spawnFloatingScore(cur.lastGain);
     const picked = choicesEl.querySelector(`[data-choice="${lastChoice}"]`);
     if (picked) playOnce(picked, 'pop');
+  } else if (cur.phase === 'gameover' && isNewBest) {
+    // 신기록 게임오버: 실패 연출 대신 축하 점프 (스펙: "신기록이면 축하 점프")
+    playOnce(mascotEl, 'jump');
   } else {
     playOnce(gameEl, 'shake');
     playOnce(mascotEl, 'wobble');
@@ -142,9 +148,6 @@ function renderChoices(problem) {
 
 // render는 타이머 때문에 매 프레임 불리므로, 버튼은 문제가 바뀔 때만 다시 만든다
 let renderedProblem = null;
-
-// 직전에 고른 보기 — 결과 공개 때 .picked 표시용 (UI 전용 상태)
-let lastChoice = null;
 
 function render() {
   heartsEl.textContent =
