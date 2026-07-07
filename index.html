@@ -66,9 +66,12 @@
     </div>
 
     <p id="question" hidden></p>
-    <div id="choices"><!-- 보기 버튼은 game.js가 문제 유형에 맞춰 그린다 --></div>
-    <p id="feedback"></p>
-    <button id="next" hidden>다음 문제</button>
+    <!-- 보기+피드백+다음 묶음 — 남는 세로 공간의 중앙에 배치 (style.css #answer-area) -->
+    <div id="answer-area">
+      <div id="choices"><!-- 보기 버튼은 game.js가 문제 유형에 맞춰 그린다 --></div>
+      <p id="feedback"></p>
+      <button id="next" hidden>다음 문제</button>
+    </div>
   </main>
 
   <div id="gameover" hidden>

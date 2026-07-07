@@ -157,9 +157,18 @@ body {
 }
 #question[hidden] { display: none; }
 
+/* 보기+피드백+다음 묶음 — 문제 아래 남는 세로 공간의 중앙에.
+   개별 요소에 auto 마진을 주면 #next가 hidden일 때 마진이 사라져
+   단계마다 위치가 튄다 — 반드시 래퍼가 갖는다. */
+#answer-area {
+  width: 100%;
+  margin-block: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 #choices {
   width: 100%;
-  margin-top: auto; /* 하단 엄지 존으로 */
   display: flex;
   align-items: center;
   justify-content: center;
