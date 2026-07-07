@@ -62,10 +62,13 @@ body {
   margin-bottom: 0.5rem;
 }
 #hearts {
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   letter-spacing: 2px;
   margin-right: auto; /* 레벨·점수 칩을 오른쪽으로 민다 */
 }
+/* 하트 글리프는 U+FE0E로 텍스트 렌더링을 강제해 CSS 색을 입힌다 (game.js) */
+.heart { color: var(--red); text-shadow: 0 2px 0 rgba(0, 0, 0, 0.18); }
+.heart.off { color: #d4d4d4; text-shadow: none; }
 #level {
   background: #fff;
   border-radius: 999px;

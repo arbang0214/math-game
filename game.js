@@ -156,9 +156,23 @@ function renderChoices(problem) {
 // render는 타이머 때문에 매 프레임 불리므로, 버튼은 문제가 바뀔 때만 다시 만든다
 let renderedProblem = null;
 
+// 하트 HUD — render는 매 프레임 불리므로 목숨 수가 바뀔 때만 다시 그린다
+let renderedHearts = null;
+function renderHearts(hearts) {
+  if (hearts === renderedHearts) return;
+  renderedHearts = hearts;
+  heartsEl.setAttribute('aria-label', `목숨 ${hearts}개`);
+  heartsEl.textContent = '';
+  for (let i = 0; i < MAX_HEARTS; i++) {
+    const h = document.createElement('span');
+    h.className = i < hearts ? 'heart' : 'heart off';
+    h.textContent = '♥︎'; // ♥ + 텍스트 프레젠테이션 강제(이모지 방지)
+    heartsEl.append(h);
+  }
+}
+
 function render() {
-  heartsEl.textContent =
-    '❤'.repeat(state.hearts) + '🤍'.repeat(MAX_HEARTS - state.hearts);
+  renderHearts(state.hearts);
   levelEl.textContent = `Lv.${state.level}`;
   const mult = comboMultiplier(state.combo);
   scoreEl.textContent =
