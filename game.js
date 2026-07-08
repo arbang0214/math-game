@@ -115,6 +115,9 @@ function renderWithFractions(el, text) {
     }
     const frac = document.createElement('span');
     frac.className = 'frac';
+    // 스크린리더가 "3 5"가 아니라 "5분의 3"으로 읽도록 — 하트 HUD와 같은 role="img" 패턴
+    frac.setAttribute('role', 'img');
+    frac.setAttribute('aria-label', `${seg.den}분의 ${seg.num}`);
     const num = document.createElement('span');
     num.className = 'num';
     num.textContent = seg.num;
