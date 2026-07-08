@@ -51,6 +51,10 @@
   필요. 5단계 스펙: `docs/specs/problem-types.md`
 - 화면 디자인 개편(팝 카툰 테마 + 리본 토끼 마스코트) 완료 — 스펙:
   `docs/superpowers/specs/2026-07-07-visual-redesign-design.md`
+- 마스코트 v8 리디자인 + 당근 목숨 완료(2026-07-08) — 토끼 SVG 좌표는
+  사용자 확정값이라 임의 재설계 금지. 목숨은 `#carrot-icon` symbol +
+  `renderHearts`의 `createElementNS` 방식. 스펙:
+  `docs/superpowers/specs/2026-07-08-mascot-carrot-redesign-design.md`
 - 문제 유형 3종: `compare`(이지선다, answer `'left'|'right'`),
   `arithmetic`·`equivalent`(사지선다, `choices` 4개 + answer 인덱스 0~3).
   `checkAnswer`는 `choice === answer` 비교 하나로 두 형태를 모두 처리 —
