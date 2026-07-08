@@ -62,13 +62,13 @@ body {
   margin-bottom: 0.5rem;
 }
 #hearts {
-  font-size: 1.6rem;
-  letter-spacing: 2px;
+  display: inline-flex;
+  gap: 3px;
   margin-right: auto; /* 레벨·점수 칩을 오른쪽으로 민다 */
 }
-/* 하트 글리프는 U+FE0E로 텍스트 렌더링을 강제해 CSS 색을 입힌다 (game.js) */
-.heart { color: var(--red); text-shadow: 0 2px 0 rgba(0, 0, 0, 0.18); }
-.heart.off { color: #d4d4d4; text-shadow: none; }
+/* 당근 목숨 아이콘 (#carrot-icon 참조는 game.js) — 잃은 목숨은 회색으로 바랜다 */
+.carrot { width: 1.6rem; height: 1.75rem; }
+.carrot.off { filter: grayscale(1); opacity: 0.4; }
 #level {
   background: #fff;
   border-radius: 999px;

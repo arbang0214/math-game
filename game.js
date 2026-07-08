@@ -159,7 +159,9 @@ function renderChoices(problem) {
 // render는 타이머 때문에 매 프레임 불리므로, 버튼은 문제가 바뀔 때만 다시 만든다
 let renderedProblem = null;
 
-// 하트 HUD — render는 매 프레임 불리므로 목숨 수가 바뀔 때만 다시 그린다
+// 당근 목숨 HUD — render는 매 프레임 불리므로 목숨 수가 바뀔 때만 다시 그린다.
+// SVG 요소는 createElement가 아니라 createElementNS로 만들어야 그려진다.
+const SVG_NS = 'http://www.w3.org/2000/svg';
 let renderedHearts = null;
 function renderHearts(hearts) {
   if (hearts === renderedHearts) return;
@@ -167,10 +169,13 @@ function renderHearts(hearts) {
   heartsEl.setAttribute('aria-label', `목숨 ${hearts}개`);
   heartsEl.textContent = '';
   for (let i = 0; i < MAX_HEARTS; i++) {
-    const h = document.createElement('span');
-    h.className = i < hearts ? 'heart' : 'heart off';
-    h.textContent = '♥︎'; // ♥ + 텍스트 프레젠테이션 강제(이모지 방지)
-    heartsEl.append(h);
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('class', i < hearts ? 'carrot' : 'carrot off');
+    svg.setAttribute('viewBox', '0 0 24 26');
+    const use = document.createElementNS(SVG_NS, 'use');
+    use.setAttribute('href', '#carrot-icon');
+    svg.append(use);
+    heartsEl.append(svg);
   }
 }
 
