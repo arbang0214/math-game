@@ -172,6 +172,8 @@ function renderHearts(hearts) {
     const svg = document.createElementNS(SVG_NS, 'svg');
     svg.setAttribute('class', i < hearts ? 'carrot' : 'carrot off');
     svg.setAttribute('viewBox', '0 0 24 26');
+    // 컨테이너(#hearts)가 role="img"라 자식은 원래 프레젠테이션 처리되지만, 스크린리더 방어용
+    svg.setAttribute('aria-hidden', 'true');
     const use = document.createElementNS(SVG_NS, 'use');
     use.setAttribute('href', '#carrot-icon');
     svg.append(use);
