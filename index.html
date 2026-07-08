@@ -16,60 +16,70 @@
     <div id="timer-bar"><div id="timer-fill"></div></div>
 
     <div id="stage">
-      <!-- 리본 토끼 마스코트 — 표정 4종(.face-*)을 겹쳐 두고 data-face로 전환 -->
+      <!-- 리본 토끼 마스코트 v2 — 표정 4종(.face-*)을 겹쳐 두고 data-face로 전환.
+           지오메트리는 2026-07-08 리디자인 스펙에서 사용자가 확정한 값 -->
       <div id="mascot" data-face="idle">
-        <svg viewBox="0 0 100 112" aria-hidden="true">
-          <!-- 귀: 왼쪽 쫑긋, 오른쪽 살짝 접힘 -->
-          <g transform="rotate(-6 38 26)">
-            <ellipse cx="38" cy="26" rx="9.5" ry="23" fill="#ffffff"/>
-            <ellipse cx="38" cy="29" rx="5" ry="15" fill="#ffd3e0"/>
-          </g>
-          <g transform="rotate(14 63 28)">
-            <ellipse cx="63" cy="28" rx="9.5" ry="22" fill="#ffffff"/>
-            <ellipse cx="63" cy="31" rx="5" ry="14" fill="#ffd3e0"/>
-          </g>
-          <!-- 몸통(머리와 한 덩어리) -->
-          <ellipse cx="50" cy="74" rx="33" ry="31" fill="#ffffff"/>
+        <svg viewBox="0 0 140 152" aria-hidden="true">
+          <defs>
+            <!-- 단추 눈(반짝임 2겹) — idle/happy/worried 공용 -->
+            <g id="eyes-button">
+              <circle cx="56" cy="78" r="5.2" fill="#3a3a3a"/>
+              <circle cx="84" cy="78" r="5.2" fill="#3a3a3a"/>
+              <circle cx="57.9" cy="76.1" r="1.8" fill="#ffffff"/>
+              <circle cx="85.9" cy="76.1" r="1.8" fill="#ffffff"/>
+              <circle cx="54.5" cy="80.4" r="0.8" fill="#ffffff"/>
+              <circle cx="82.5" cy="80.4" r="0.8" fill="#ffffff"/>
+            </g>
+          </defs>
+          <!-- 귀: 머리 위에 나란히, 속귀 연분홍 -->
+          <ellipse cx="59" cy="27" rx="10" ry="26" fill="#ffffff" transform="rotate(-5 59 27)"/>
+          <ellipse cx="81" cy="27" rx="10" ry="26" fill="#ffffff" transform="rotate(5 81 27)"/>
+          <ellipse cx="59" cy="31" rx="5" ry="17" fill="#ffd9e3" transform="rotate(-5 59 27)"/>
+          <ellipse cx="81" cy="31" rx="5" ry="17" fill="#ffd9e3" transform="rotate(5 81 27)"/>
+          <!-- 몸통(서양배형) + 발 + 배 위에 모은 앞발(연한 음영) -->
+          <ellipse cx="70" cy="126" rx="27" ry="23" fill="#ffffff"/>
+          <ellipse cx="56" cy="143" rx="9" ry="5" fill="#ffffff"/>
+          <ellipse cx="84" cy="143" rx="9" ry="5" fill="#ffffff"/>
+          <ellipse cx="62" cy="117" rx="6.5" ry="5.5" fill="#f3ecf2" transform="rotate(15 62 117)"/>
+          <ellipse cx="78" cy="117" rx="6.5" ry="5.5" fill="#f3ecf2" transform="rotate(-15 78 117)"/>
+          <!-- 머리: 타원 + 볼 원 2개 + 턱 타원의 합집합으로 볼 통통 실루엣 -->
+          <ellipse cx="70" cy="74" rx="33" ry="31" fill="#ffffff"/>
+          <circle cx="48" cy="93" r="12" fill="#ffffff"/>
+          <circle cx="92" cy="93" r="12" fill="#ffffff"/>
+          <ellipse cx="70" cy="96" rx="28" ry="15" fill="#ffffff"/>
           <!-- 핑크 리본 (오른쪽 귀 밑) -->
-          <g transform="rotate(10 68 46)">
-            <path d="M68 46 L57 40 Q54 46 57 52 Z" fill="#ff6b9d"/>
-            <path d="M68 46 L79 40 Q82 46 79 52 Z" fill="#ff6b9d"/>
-            <circle cx="68" cy="46" r="4" fill="#ff4f8b"/>
+          <g transform="rotate(14 94 46)">
+            <path d="M94 46 L83 40 Q80 46 83 52 Z" fill="#ff6b9d"/>
+            <path d="M94 46 L105 40 Q108 46 105 52 Z" fill="#ff6b9d"/>
+            <circle cx="94" cy="46" r="4" fill="#ff4f8b"/>
           </g>
-          <!-- 코와 볼은 모든 표정 공통 -->
-          <ellipse cx="50" cy="76" rx="2.2" ry="1.7" fill="#ff8fab"/>
-          <ellipse cx="30" cy="77" rx="5" ry="3.6" fill="#ffc2d4" opacity="0.8"/>
-          <ellipse cx="70" cy="77" rx="5" ry="3.6" fill="#ffc2d4" opacity="0.8"/>
-          <!-- 표정: 기본 (점 눈 + ω 입) -->
+          <!-- 코와 볼터치는 모든 표정 공통 -->
+          <ellipse cx="70" cy="87" rx="2.4" ry="1.9" fill="#ff9fb2"/>
+          <ellipse cx="45" cy="92" rx="7.5" ry="4.8" fill="#ffc9d6" opacity="0.9"/>
+          <ellipse cx="95" cy="92" rx="7.5" ry="4.8" fill="#ffc9d6" opacity="0.9"/>
+          <!-- 표정: 기본 (단추 눈 + ω 입) -->
           <g class="face face-idle">
-            <circle cx="39" cy="70" r="3.4" fill="#4a4a4a"/>
-            <circle cx="61" cy="70" r="3.4" fill="#4a4a4a"/>
-            <circle cx="40.2" cy="68.8" r="1.1" fill="#ffffff"/>
-            <circle cx="62.2" cy="68.8" r="1.1" fill="#ffffff"/>
-            <path d="M46 80 Q48 83 50 80 Q52 83 54 80" stroke="#4a4a4a" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <use href="#eyes-button"/>
+            <path d="M64 92 Q67 95 70 92 Q73 95 76 92" stroke="#4a4a4a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
           </g>
-          <!-- 표정: 정답 (눈웃음 + 함박웃음) -->
+          <!-- 표정: 정답 (단추 눈 그대로 + 조그맣게 벌린 빨간 입) -->
           <g class="face face-happy">
-            <path d="M34 70 Q39 64 44 70" stroke="#4a4a4a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-            <path d="M56 70 Q61 64 66 70" stroke="#4a4a4a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-            <path d="M43 80 Q50 88 57 80" stroke="#4a4a4a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+            <use href="#eyes-button"/>
+            <path d="M63 90 Q70 93 77 90 Q75.5 97.5 70 98 Q64.5 97.5 63 90 Z" fill="#e85550"/>
           </g>
           <!-- 표정: 오답/시간초과 (X자 눈 + 벌어진 입) -->
           <g class="face face-dizzy">
-            <path d="M35 66 L43 74 M43 66 L35 74" stroke="#4a4a4a" stroke-width="2.6" stroke-linecap="round"/>
-            <path d="M57 66 L65 74 M65 66 L57 74" stroke="#4a4a4a" stroke-width="2.6" stroke-linecap="round"/>
-            <ellipse cx="50" cy="82" rx="3.2" ry="4" fill="#4a4a4a"/>
+            <path d="M52 74 L60 82 M60 74 L52 82" stroke="#3a3a3a" stroke-width="2.8" stroke-linecap="round"/>
+            <path d="M80 74 L88 82 M88 74 L80 82" stroke="#3a3a3a" stroke-width="2.8" stroke-linecap="round"/>
+            <ellipse cx="70" cy="95" rx="3.4" ry="4.2" fill="#3a3a3a"/>
           </g>
-          <!-- 표정: 초조 (안쪽이 올라간 눈썹 + 물결 입 + 땀방울) — 시간이 얼마 안 남았을 때 -->
+          <!-- 표정: 초조 (처진 눈썹 + 단추 눈 + 물결 입 + 땀방울) -->
           <g class="face face-worried">
-            <path d="M33 64 Q39 60 44 62" stroke="#4a4a4a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-            <path d="M56 62 Q61 60 67 64" stroke="#4a4a4a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-            <circle cx="39" cy="71" r="3.4" fill="#4a4a4a"/>
-            <circle cx="61" cy="71" r="3.4" fill="#4a4a4a"/>
-            <circle cx="40.2" cy="69.8" r="1.1" fill="#ffffff"/>
-            <circle cx="62.2" cy="69.8" r="1.1" fill="#ffffff"/>
-            <path d="M45 81 Q47.5 79 50 81 Q52.5 83 55 81" stroke="#4a4a4a" stroke-width="2" fill="none" stroke-linecap="round"/>
-            <path d="M79 56 Q83 62 79 65 Q75 62 79 56" fill="#9ad8ff"/>
+            <path d="M49 70 Q55 65.5 61 67.5" stroke="#3a3a3a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+            <path d="M79 67.5 Q85 65.5 91 70" stroke="#3a3a3a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+            <use href="#eyes-button"/>
+            <path d="M63 92.5 Q66.5 90.5 70 92.5 Q73.5 94.5 77 92.5" stroke="#3a3a3a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+            <path d="M103 60 Q107 66 103 69 Q99 66 103 60" fill="#9ad8ff"/>
           </g>
         </svg>
       </div>
