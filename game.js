@@ -71,8 +71,11 @@ function saveNickname(name) {
 
 let scoreSubmitted = false; // 게임당 1회 등록
 
-// TOP 10 조회·그리기 — 실패해도 게임 진행에는 영향이 없다
+// TOP 10 조회·그리기 — 실패해도 게임 진행에는 영향이 없다.
+// 겹쳐 호출되면(게임오버 진입 직후 등록 등) 늦게 도착한 이전 응답을 세대 번호로 버린다.
+let rankingGen = 0;
 async function refreshRanking() {
+  const gen = ++rankingGen;
   lbStatusEl.textContent = '불러오는 중...';
   rankingEl.textContent = '';
   try {
@@ -80,6 +83,7 @@ async function refreshRanking() {
     const res = await fetch(url, options);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const rows = parseTopResponse(await res.json());
+    if (gen !== rankingGen) return; // 더 새로운 조회가 시작됨 — 이 응답은 버린다
     lbStatusEl.textContent = rows.length === 0 ? '아직 등록된 점수가 없어요' : '';
     for (const row of rows) {
       const li = document.createElement('li');
@@ -87,6 +91,7 @@ async function refreshRanking() {
       rankingEl.append(li);
     }
   } catch {
+    if (gen !== rankingGen) return;
     lbStatusEl.textContent = '순위를 불러오지 못했어요';
   }
 }
