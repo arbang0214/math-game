@@ -120,15 +120,21 @@ body {
   gap: 0.6rem;
   margin-top: 1.2rem;
 }
-#mascot { width: 7rem; flex-shrink: 0; }
-#mascot svg { display: block; width: 100%; }
+#mascot { position: relative; width: 7rem; height: 10.5rem; flex-shrink: 0; }
 
-/* 표정 4종은 SVG에 겹쳐 있고 data-face로 하나만 보인다 */
-#mascot .face { display: none; }
+/* 표정 4종 PNG를 같은 자리에 겹쳐 두고 data-face로 하나만 보인다 */
+#mascot .face {
+  display: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
 #mascot[data-face="idle"] .face-idle,
 #mascot[data-face="happy"] .face-happy,
 #mascot[data-face="dizzy"] .face-dizzy,
-#mascot[data-face="worried"] .face-worried { display: inline; }
+#mascot[data-face="worried"] .face-worried { display: block; }
 
 #bubble {
   position: relative;
