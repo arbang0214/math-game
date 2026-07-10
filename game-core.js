@@ -8,14 +8,14 @@
 
 import { makeProblem, checkAnswer } from './problems.js';
 
-export const MAX_HEARTS = 3;
-export const TIME_LIMIT_MS = 10000; // 레벨 1 기준 제한시간
+export const MAX_HEARTS = 5;
+export const TIME_LIMIT_MS = 12000; // 레벨 1 기준 제한시간
 export const BASE_SCORE = 10;
 export const COMBO_STEP = 3; // 연속 정답 이 개수마다 배율 +1
 export const MAX_MULTIPLIER = 4;
 export const LEVEL_SCORE_STEP = 100; // 이 점수마다 레벨 +1 (6단계)
 export const TIME_STEP_MS = 500; // 레벨당 제한시간 감소량
-export const TIME_MIN_MS = 6000; // 제한시간 하한
+export const TIME_MIN_MS = 8000; // 제한시간 하한
 
 // 연속 정답 수(combo)에 따른 점수 배율: 1~2연속 ×1, 3~5연속 ×2, 6~8연속 ×3, 9연속부터 ×4
 export function comboMultiplier(combo) {

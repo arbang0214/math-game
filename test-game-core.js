@@ -273,8 +273,8 @@ test('levelForScore 경계값: 100점마다 레벨 +1', () => {
     assert(levelForScore(score) === level, `점수 ${score}의 레벨이 ${level}이 아님: ${levelForScore(score)}`);
   }
 });
-test('timeLimitForLevel: 레벨당 0.5초 감소, 하한 6초', () => {
-  const cases = [[1, 10000], [2, 9500], [5, 8000], [9, 6000], [10, 6000], [99, 6000]];
+test('timeLimitForLevel: 레벨당 0.5초 감소, 하한 8초', () => {
+  const cases = [[1, 12000], [2, 11500], [5, 10000], [9, 8000], [10, 8000], [99, 8000]];
   for (const [level, ms] of cases) {
     assert(timeLimitForLevel(level) === ms, `L${level} 제한시간이 ${ms}가 아님: ${timeLimitForLevel(level)}`);
   }

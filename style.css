@@ -69,7 +69,7 @@ body {
   margin-right: auto; /* 레벨·점수 칩을 오른쪽으로 민다 */
 }
 /* 당근 목숨 아이콘 (#carrot-icon 참조는 game.js) — 잃은 목숨은 회색으로 바랜다 */
-.carrot { width: 1.6rem; height: 1.75rem; }
+.carrot { width: 2rem; height: 2.17rem; }
 .carrot.off { filter: grayscale(1); opacity: 0.4; }
 #level {
   background: #fff;
