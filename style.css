@@ -346,7 +346,7 @@ body {
   color: #374151;
   margin: 0 0 1rem;
 }
-#restart, #start-game {
+#restart, #start-game, #lb-restart {
   font-family: inherit;
   font-size: 1.2rem;
   font-weight: 800;
@@ -358,7 +358,7 @@ body {
   cursor: pointer;
   box-shadow: 0 5px 0 var(--pink);
 }
-#restart:active, #start-game:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--pink); }
+#restart:active, #start-game:active, #lb-restart:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--pink); }
 /* 신기록: 패널이 통통 튀고 별이 반짝인다 */
 #gameover.newbest .panel { animation: pop 0.5s ease; }
 #gameover.newbest .panel::before,
