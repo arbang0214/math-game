@@ -1,5 +1,7 @@
 # Supabase 무료 플랜은 7일간 DB 활동이 없으면 일시정지된다 — 주 2회 조회로 깨어 있게 유지.
 # URL과 anon key는 공개 전제(RLS가 방어선)라 평문으로 둔다 (leaderboard-config.js와 같은 값).
+# 주의: 저장소에 60일간 커밋 등 활동이 없으면 GitHub이 스케줄 워크플로를 자동 비활성화한다
+#       — 그때는 Actions 탭에서 다시 활성화해야 keepalive가 돈다.
 name: supabase-keepalive
 on:
   schedule:
