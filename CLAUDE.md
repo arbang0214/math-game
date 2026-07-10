@@ -51,10 +51,12 @@
   `docs/specs/problem-types.md`
 - 화면 디자인 개편(팝 카툰 테마 + 리본 토끼 마스코트) 완료 — 스펙:
   `docs/superpowers/specs/2026-07-07-visual-redesign-design.md`
-- 마스코트 v8 리디자인 + 당근 목숨 완료(2026-07-08) — 토끼 SVG 좌표는
-  사용자 확정값이라 임의 재설계 금지. 목숨은 `#carrot-icon` symbol +
-  `renderHearts`의 `createElementNS` 방식. 스펙:
-  `docs/superpowers/specs/2026-07-08-mascot-carrot-redesign-design.md`
+- 마스코트는 AI 생성 PNG(assets/rabbit-*.png, 원본 1024×1536) — 표정 4종은
+  `data-face`로 전환(img 4장 겹침), 게임오버 컷 2장은 `isNewBest` 분기. 스펙:
+  `docs/superpowers/specs/2026-07-10-image-assets-design.md`. 당근 목숨은
+  `#carrot-icon` SVG symbol + `renderHearts`의 `createElementNS` 방식 유지.
+  **미결**: 토끼 PNG 6장 합계 ~13MB — 축소(512px)하면 흐릿하다는 피드백이
+  있었음. 줄이려면 샤픈 후처리나 WebP 변환 검토 필요
 - 문제 유형 3종: `compare`(이지선다, answer `'left'|'right'`),
   `arithmetic`·`equivalent`(사지선다, `choices` 4개 + answer 인덱스 0~3).
   `checkAnswer`는 `choice === answer` 비교 하나로 두 형태를 모두 처리 —
