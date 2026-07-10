@@ -1,6 +1,7 @@
 // leaderboard.js 단위 테스트 — 실행: node test-leaderboard.js
 import {
   validateNickname, isConfigured, buildSubmitRequest, buildTopRequest, parseTopResponse,
+  qualifiesForTop,
 } from './leaderboard.js';
 
 let pass = 0;
@@ -105,6 +106,29 @@ test('parseTopResponse: 배열이 아니면 빈 배열', () => {
   assert(parseTopResponse({}).length === 0, '객체 → []');
 });
 
+// TOP N 진입 판정용 목록 생성 — 점수 내림차순 n개
+function fakeRows(scores) {
+  return scores.map((score, i) => ({ rank: i + 1, nickname: `유저${i}`, score }));
+}
+
+console.log('qualifiesForTop (결정적)');
+test('빈 순위표에는 0점도 진입한다', () => {
+  assert(qualifiesForTop([], 0), '빈 목록이면 무조건 진입');
+});
+test('자리가 남아 있으면(10개 미만) 어떤 점수든 진입한다', () => {
+  assert(qualifiesForTop(fakeRows([100, 50, 30]), 10), '3개뿐이면 10점도 진입');
+});
+test('꽉 찼을 때 10위보다 높으면 진입, 같거나 낮으면 탈락', () => {
+  const full = fakeRows([100, 90, 80, 70, 60, 50, 40, 30, 20, 10]);
+  assert(qualifiesForTop(full, 20), '10위(10점)보다 높은 20점은 진입');
+  assert(!qualifiesForTop(full, 10), '동점은 먼저 등록한 쪽이 위 — 10점은 탈락');
+  assert(!qualifiesForTop(full, 0), '10위보다 낮으면 탈락');
+});
+test('qualifiesForTop: 배열이 아니면 false', () => {
+  assert(!qualifiesForTop(null, 100), 'null → false');
+  assert(!qualifiesForTop(undefined, 100), 'undefined → false');
+});
+
 console.log('무작위 속성 검사');
 test('무작위 문자열 500개: 검증을 통과한 닉네임은 항상 한글/영문/숫자 1~8자', () => {
   const pool = '가나다랑ABz09 !@#/\\.,한글English🐰';
@@ -131,6 +155,18 @@ test('무작위 유효 입력 500개: 등록 요청 바디는 JSON 왕복이 되
     const round = JSON.parse(options.body);
     assert(round.nickname === entry.nickname && round.score === entry.score,
       `바디 왕복 불일치: ${options.body}`);
+  }
+});
+
+test('무작위 꽉 찬 순위표 500개: 진입 판정은 정확히 "10위 점수보다 큰가"와 일치한다', () => {
+  for (let i = 0; i < 500; i++) {
+    const scores = Array.from({ length: 10 }, () => Math.floor(Math.random() * 1000) * 10)
+      .sort((a, b) => b - a);
+    const rows = fakeRows(scores);
+    const score = Math.floor(Math.random() * 1000) * 10;
+    const expected = score > scores[9];
+    assert(qualifiesForTop(rows, score) === expected,
+      `점수 ${score}, 10위 ${scores[9]}: 기대 ${expected}`);
   }
 });
 

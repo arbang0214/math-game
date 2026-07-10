@@ -9,6 +9,7 @@ import { fractionSegments } from './format.js';
 import { LEADERBOARD_CONFIG } from './leaderboard-config.js';
 import {
   validateNickname, isConfigured, buildSubmitRequest, buildTopRequest, parseTopResponse,
+  qualifiesForTop,
 } from './leaderboard.js';
 
 const heartsEl = document.getElementById('hearts');
@@ -172,6 +173,30 @@ function startGame() {
   update(createGame());
 }
 
+// 게임오버마다 TOP 10을 조회해 이번 점수가 순위에 들면 등록 폼을 연다.
+// 조회 실패 시엔 개인 신기록 여부로 대신 판정한다 (오프라인 등에서 최선).
+// 겹침·화면 이탈은 세대 번호와 screen 검사로 무시한다 (rankingGen과 같은 패턴)
+let submitGen = 0;
+async function prepareSubmitForm(score) {
+  const gen = ++submitGen;
+  let qualifies;
+  try {
+    const { url, options } = buildTopRequest(LEADERBOARD_CONFIG);
+    const res = await fetch(url, options);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    qualifies = qualifiesForTop(parseTopResponse(await res.json()), score);
+  } catch {
+    qualifies = isNewBest;
+  }
+  if (gen !== submitGen || screen !== 'gameover' || !qualifies) return;
+  scoreSubmitted = false;
+  submitScoreBtn.disabled = false;
+  nicknameEl.value = loadNickname();
+  submitStatusEl.textContent = '';
+  newbestFormEl.hidden = false;
+  showRankingBtn.hidden = true; // 등록 폼의 [확인]이 순위 이동을 대신한다
+}
+
 // 상태 교체 지점을 한 곳으로 모아 gameover 진입 시에만 최고점을 갱신한다
 function update(newState) {
   const prevState = state;
@@ -183,16 +208,10 @@ function update(newState) {
       best = state.score;
       saveBest(best);
     }
-    // 신기록 + Supabase 설정 시에만 등록 폼 노출. 등록이 곧 순위 이동이라 [순위 확인]은 숨긴다
-    const canSubmit = isNewBest && isConfigured(LEADERBOARD_CONFIG);
-    newbestFormEl.hidden = !canSubmit;
-    showRankingBtn.hidden = !isConfigured(LEADERBOARD_CONFIG) || canSubmit;
-    if (canSubmit) {
-      scoreSubmitted = false;
-      submitScoreBtn.disabled = false;
-      nicknameEl.value = loadNickname();
-      submitStatusEl.textContent = '';
-    }
+    // 이번 점수가 전체 TOP 10에 들 수 있으면 등록 폼을 연다 (조회 후 비동기 판정)
+    newbestFormEl.hidden = true;
+    showRankingBtn.hidden = !isConfigured(LEADERBOARD_CONFIG);
+    if (isConfigured(LEADERBOARD_CONFIG)) prepareSubmitForm(state.score);
   }
   playEffects(prevState, state);
   render();

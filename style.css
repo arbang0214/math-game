@@ -441,6 +441,7 @@ body {
 .btn-sub:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--sky-shadow); }
 #newbest-form { margin: 0 0 0.8rem; }
 #newbest-form[hidden] { display: none; }
+.lb-callout { font-weight: 900; color: var(--yellow-deep); margin: 0 0 0.5rem; }
 #submit-status {
   min-height: 1.2rem;
   margin: 0.3rem 0 0;

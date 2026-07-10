@@ -53,6 +53,14 @@ export function buildTopRequest(config, limit = 10) {
   };
 }
 
+// 이번 점수가 전체 TOP N에 들어갈 수 있는지 — 자리가 남았거나 꼴찌보다 높으면 진입.
+// 동점은 먼저 등록한 쪽이 위(서버 정렬 규칙)이므로 동점으로는 밀어내지 못한다.
+export function qualifiesForTop(rows, score, limit = 10) {
+  if (!Array.isArray(rows)) return false;
+  if (rows.length < limit) return true;
+  return score > rows[limit - 1].score;
+}
+
 // 서버 응답(JSON 배열)을 [{rank, nickname, score}]로 — 형식이 어긋난 항목은 버린다
 export function parseTopResponse(json) {
   if (!Array.isArray(json)) return [];
