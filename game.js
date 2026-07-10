@@ -6,6 +6,10 @@ import {
 } from './game-core.js';
 import { answerText } from './problems.js';
 import { fractionSegments } from './format.js';
+import { LEADERBOARD_CONFIG } from './leaderboard-config.js';
+import {
+  validateNickname, isConfigured, buildSubmitRequest, buildTopRequest, parseTopResponse,
+} from './leaderboard.js';
 
 const heartsEl = document.getElementById('hearts');
 const levelEl = document.getElementById('level');
@@ -23,6 +27,12 @@ const restartBtn = document.getElementById('restart');
 const gameEl = document.getElementById('game');
 const mascotEl = document.getElementById('mascot');
 
+const leaderboardEl = document.getElementById('leaderboard');
+const rankingEl = document.getElementById('ranking');
+const nicknameEl = document.getElementById('nickname');
+const submitScoreBtn = document.getElementById('submit-score');
+const lbStatusEl = document.getElementById('lb-status');
+
 // 최고점: localStorage (사생활 보호 모드 등에서 막혀 있으면 이번 세션만 기억)
 const BEST_KEY = 'math-game.best';
 function loadBest() {
@@ -37,6 +47,73 @@ function saveBest(score) {
     localStorage.setItem(BEST_KEY, String(score));
   } catch {
     // 저장 실패해도 게임은 계속되어야 한다
+  }
+}
+
+// ---------- 리더보드 (fetch 실행과 그리기만 — 규칙은 leaderboard.js) ----------
+
+// 마지막 닉네임 기억 (최고점과 같은 localStorage 패턴)
+const NICK_KEY = 'math-game.nickname';
+function loadNickname() {
+  try {
+    return localStorage.getItem(NICK_KEY) || '';
+  } catch {
+    return '';
+  }
+}
+function saveNickname(name) {
+  try {
+    localStorage.setItem(NICK_KEY, name);
+  } catch {
+    // 저장 실패해도 게임은 계속되어야 한다
+  }
+}
+
+let scoreSubmitted = false; // 게임당 1회 등록
+
+// TOP 10 조회·그리기 — 실패해도 게임 진행에는 영향이 없다
+async function refreshRanking() {
+  lbStatusEl.textContent = '불러오는 중...';
+  rankingEl.textContent = '';
+  try {
+    const { url, options } = buildTopRequest(LEADERBOARD_CONFIG);
+    const res = await fetch(url, options);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const rows = parseTopResponse(await res.json());
+    lbStatusEl.textContent = rows.length === 0 ? '아직 등록된 점수가 없어요' : '';
+    for (const row of rows) {
+      const li = document.createElement('li');
+      li.textContent = `${row.nickname} — ${row.score}점`; // 순위 번호는 ol이 붙인다
+      rankingEl.append(li);
+    }
+  } catch {
+    lbStatusEl.textContent = '순위를 불러오지 못했어요';
+  }
+}
+
+// 점수 등록 — 성공하면 버튼을 잠그고 목록을 갱신한다
+async function submitScore() {
+  const checked = validateNickname(nicknameEl.value);
+  if (!checked.ok) {
+    lbStatusEl.textContent = checked.reason;
+    return;
+  }
+  submitScoreBtn.disabled = true;
+  lbStatusEl.textContent = '등록 중...';
+  try {
+    const { url, options } = buildSubmitRequest(LEADERBOARD_CONFIG, {
+      nickname: checked.nickname,
+      score: state.score,
+    });
+    const res = await fetch(url, options);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    scoreSubmitted = true;
+    saveNickname(checked.nickname);
+    await refreshRanking();
+    lbStatusEl.textContent = '등록 완료!';
+  } catch {
+    lbStatusEl.textContent = '등록에 실패했어요';
+    submitScoreBtn.disabled = false; // 재시도 허용
   }
 }
 
@@ -56,6 +133,13 @@ function update(newState) {
     if (isNewBest) {
       best = state.score;
       saveBest(best);
+    }
+    // 게임오버에 들어올 때마다 리더보드를 새로 준비한다
+    if (isConfigured(LEADERBOARD_CONFIG)) {
+      scoreSubmitted = false;
+      submitScoreBtn.disabled = false;
+      nicknameEl.value = loadNickname();
+      refreshRanking();
     }
   }
   playEffects(prevState, state);
@@ -267,6 +351,16 @@ restartBtn.addEventListener('click', () => {
   update(createGame());
 });
 
+// 등록 중(버튼 비활성)이거나 이미 등록했으면 무시 — Enter 연타로 인한 이중 POST 방지
+function trySubmitScore() {
+  if (scoreSubmitted || submitScoreBtn.disabled) return;
+  submitScore();
+}
+submitScoreBtn.addEventListener('click', trySubmitScore);
+nicknameEl.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') trySubmitScore();
+});
+
 // 실제 시계: 매 프레임 흐른 시간을 core에 주입한다.
 // 탭 전환 등으로 프레임이 오래 멈췄을 때 한 번에 시간이 다 깎이지 않도록 상한을 둔다.
 let lastTs = null;
@@ -279,5 +373,8 @@ function frame(ts) {
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
+
+// 설정이 비어 있으면 리더보드 섹션을 통째로 숨긴다 (Supabase 셋업 전에도 게임은 동작)
+leaderboardEl.hidden = !isConfigured(LEADERBOARD_CONFIG);
 
 render();

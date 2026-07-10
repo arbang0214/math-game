@@ -328,6 +328,54 @@ body {
 #gameover.newbest .panel::before { left: -0.7rem; }
 #gameover.newbest .panel::after { right: -0.7rem; animation-delay: 0.4s; }
 
+/* ---------- 리더보드 (게임오버 패널 안) ---------- */
+
+#leaderboard { margin: 0 0 1rem; }
+#leaderboard[hidden] { display: none; }
+#leaderboard .lb-title { font-size: 1.05rem; font-weight: 900; margin: 0 0 0.4rem; }
+#ranking {
+  margin: 0 auto 0.4rem;
+  padding-left: 1.6rem;
+  max-width: 15rem;
+  text-align: left;
+  font-weight: 700;
+  color: #374151;
+}
+#ranking li { margin: 0.12rem 0; }
+#lb-status {
+  min-height: 1.2rem;
+  margin: 0 0 0.4rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #6b7280;
+}
+.lb-form { display: flex; gap: 0.4rem; justify-content: center; }
+#nickname {
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  width: 9.5rem;
+  padding: 0.45rem 0.7rem;
+  border: 3px solid var(--pink-border);
+  border-radius: 12px;
+}
+#nickname:focus { outline: none; border-color: var(--pink-deep); }
+#submit-score {
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 800;
+  padding: 0.45rem 1.1rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--pink-deep);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--pink);
+}
+#submit-score:disabled { opacity: 0.55; cursor: default; box-shadow: none; }
+#submit-score:not(:disabled):active { transform: translateY(3px); box-shadow: 0 1px 0 var(--pink); }
+.lb-hint { margin: 0.4rem 0 0; font-size: 0.8rem; color: #9ca3af; }
+
 /* ---------- 연출 keyframes (클래스 토글은 game.js) ---------- */
 
 @keyframes blink { from { opacity: 1; } to { opacity: 0.45; } }

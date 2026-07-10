@@ -111,6 +111,16 @@
     <div class="panel">
       <p class="title">게임 오버</p>
       <p id="final-score"></p>
+      <div id="leaderboard" hidden>
+        <p class="lb-title">🏆 전체 TOP 10</p>
+        <ol id="ranking"></ol>
+        <p id="lb-status"></p>
+        <div class="lb-form">
+          <input id="nickname" maxlength="8" placeholder="별명 (1~8자)" autocomplete="off">
+          <button id="submit-score">등록</button>
+        </div>
+        <p class="lb-hint">실명 말고 별명을 써 주세요</p>
+      </div>
       <button id="restart">다시 시작</button>
     </div>
   </div>
