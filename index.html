@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>분수/소수 타임어택</title>
   <link rel="stylesheet" href="style.css">
+  <!-- 게임오버 컷 2장은 첫 게임오버 때 팝인하지 않도록 미리 받는다 -->
+  <link rel="preload" as="image" href="assets/rabbit-cheer.png">
+  <link rel="preload" as="image" href="assets/rabbit-sad.png">
 </head>
 <body>
   <!-- 당근 목숨 아이콘 — game.js renderHearts가 <use>로 참조한다 -->
@@ -50,6 +53,8 @@
 
   <div id="gameover" hidden>
     <div class="panel">
+      <!-- 스크롤은 panel-body가 담당 — 신기록 별(::before/::after)은 panel에 남아 잘리지 않는다 -->
+      <div class="panel-body">
       <img id="gameover-cut" alt="">
       <p class="title">게임 오버</p>
       <p id="final-score"></p>
@@ -64,6 +69,7 @@
         <p class="lb-hint">실명 말고 별명을 써 주세요</p>
       </div>
       <button id="restart">다시 시작</button>
+      </div>
     </div>
   </div>
   <script type="module" src="game.js"></script>

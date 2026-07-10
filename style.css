@@ -298,10 +298,14 @@ body {
   padding: 1.5rem 2.2rem;
   text-align: center;
   box-shadow: 0 8px 0 rgba(0, 0, 0, 0.15);
-  /* 컷+리더보드로 패널이 길어짐 — 짧은 화면에선 패널 안에서 스크롤 */
+  /* 컷+리더보드로 패널이 길어짐 — 짧은 화면에선 panel-body 안에서 스크롤.
+     panel 자체를 스크롤하면 신기록 별(::before/::after)이 잘려서 래퍼로 분리 */
+  max-height: calc(100vh - 2rem);
   max-height: calc(100svh - 2rem);
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
+#gameover .panel-body { overflow-y: auto; }
 #gameover-cut {
   display: block;
   width: 5rem;
