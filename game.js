@@ -30,7 +30,11 @@ const startGameBtn = document.getElementById('start-game');
 const gameEl = document.getElementById('game');
 const mascotEl = document.getElementById('mascot');
 
-const leaderboardEl = document.getElementById('leaderboard');
+const newbestFormEl = document.getElementById('newbest-form');
+const submitStatusEl = document.getElementById('submit-status');
+const leaderboardScreenEl = document.getElementById('leaderboard-screen');
+const showRankingBtn = document.getElementById('show-ranking');
+const lbRestartBtn = document.getElementById('lb-restart');
 const rankingEl = document.getElementById('ranking');
 const nicknameEl = document.getElementById('nickname');
 const submitScoreBtn = document.getElementById('submit-score');
@@ -99,15 +103,21 @@ async function refreshRanking() {
   }
 }
 
-// 점수 등록 — 성공하면 버튼을 잠그고 목록을 갱신한다
+// 리더보드 화면 진입 — 들어갈 때마다 새로 조회한다
+function showLeaderboard() {
+  showScreen('leaderboard');
+  refreshRanking();
+}
+
+// 신기록 등록 — 성공하면 리더보드 화면으로 이동
 async function submitScore() {
   const checked = validateNickname(nicknameEl.value);
   if (!checked.ok) {
-    lbStatusEl.textContent = checked.reason;
+    submitStatusEl.textContent = checked.reason;
     return;
   }
   submitScoreBtn.disabled = true;
-  lbStatusEl.textContent = '등록 중...';
+  submitStatusEl.textContent = '등록 중...';
   try {
     const { url, options } = buildSubmitRequest(LEADERBOARD_CONFIG, {
       nickname: checked.nickname,
@@ -117,10 +127,9 @@ async function submitScore() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     scoreSubmitted = true;
     saveNickname(checked.nickname);
-    await refreshRanking();
-    lbStatusEl.textContent = '등록 완료!';
+    showLeaderboard(); // 등록 성공 → 바로 순위 화면
   } catch {
-    lbStatusEl.textContent = '등록에 실패했어요';
+    submitStatusEl.textContent = '등록에 실패했어요';
     submitScoreBtn.disabled = false; // 재시도 허용
   }
 }
@@ -134,10 +143,11 @@ let lastChoice = null;
 
 // ---------- 화면 전환 (표시 전용) ----------
 // 오버레이를 hidden 토글로 전환한다. 'playing'은 오버레이가 없는 상태.
-// 이후 leaderboard/ending 화면이 이 객체에 키를 추가한다.
+// 이후 ending 화면이 이 객체에 키를 추가한다.
 const screenEls = {
   start: startScreenEl,
   gameover: gameoverEl,
+  leaderboard: leaderboardScreenEl,
 };
 let screen = 'start';
 function showScreen(name) {
@@ -163,12 +173,15 @@ function update(newState) {
       best = state.score;
       saveBest(best);
     }
-    // 게임오버에 들어올 때마다 리더보드를 새로 준비한다
-    if (isConfigured(LEADERBOARD_CONFIG)) {
+    // 신기록 + Supabase 설정 시에만 등록 폼 노출. 등록이 곧 순위 이동이라 [순위 확인]은 숨긴다
+    const canSubmit = isNewBest && isConfigured(LEADERBOARD_CONFIG);
+    newbestFormEl.hidden = !canSubmit;
+    showRankingBtn.hidden = !isConfigured(LEADERBOARD_CONFIG) || canSubmit;
+    if (canSubmit) {
       scoreSubmitted = false;
       submitScoreBtn.disabled = false;
       nicknameEl.value = loadNickname();
-      refreshRanking();
+      submitStatusEl.textContent = '';
     }
   }
   playEffects(prevState, state);
@@ -389,6 +402,9 @@ nicknameEl.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') trySubmitScore();
 });
 
+showRankingBtn.addEventListener('click', showLeaderboard);
+lbRestartBtn.addEventListener('click', startGame);
+
 // 실제 시계: 매 프레임 흐른 시간을 core에 주입한다.
 // 탭 전환 등으로 프레임이 오래 멈췄을 때 한 번에 시간이 다 깎이지 않도록 상한을 둔다.
 let lastTs = null;
@@ -402,9 +418,6 @@ function frame(ts) {
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
-
-// 설정이 비어 있으면 리더보드 섹션을 통째로 숨긴다 (Supabase 셋업 전에도 게임은 동작)
-leaderboardEl.hidden = !isConfigured(LEADERBOARD_CONFIG);
 
 showScreen('start');
 render();

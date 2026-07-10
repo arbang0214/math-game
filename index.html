@@ -67,17 +67,34 @@
       <img id="gameover-cut" alt="">
       <p class="title">게임 오버</p>
       <p id="final-score"></p>
-      <div id="leaderboard" hidden>
-        <p class="lb-title">🏆 전체 TOP 10</p>
-        <ol id="ranking"></ol>
-        <p id="lb-status"></p>
+      <!-- 신기록일 때만 보이는 등록 폼 — 확인 시 리더보드 화면으로 이동 (game.js) -->
+      <div id="newbest-form" hidden>
         <div class="lb-form">
           <input id="nickname" maxlength="8" placeholder="별명 (1~8자)" aria-label="별명" autocomplete="off">
-          <button id="submit-score">등록</button>
+          <button id="submit-score">확인</button>
         </div>
         <p class="lb-hint">실명 말고 별명을 써 주세요</p>
+        <p id="submit-status"></p>
       </div>
-      <button id="restart">다시 시작</button>
+      <div class="btn-row">
+        <button id="restart">다시 시작</button>
+        <button id="show-ranking" class="btn-sub">순위 확인</button>
+        <button id="quit-game" class="btn-sub">게임 종료</button>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="leaderboard-screen" hidden>
+    <div class="panel">
+      <div class="panel-body">
+        <p class="title">🏆 전체 TOP 10</p>
+        <ol id="ranking"></ol>
+        <p id="lb-status"></p>
+      </div>
+      <div class="btn-row">
+        <button id="lb-restart">다시 시작</button>
+        <button id="lb-quit" class="btn-sub">게임 종료</button>
       </div>
     </div>
   </div>

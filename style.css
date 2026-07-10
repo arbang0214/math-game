@@ -368,11 +368,8 @@ body {
 #gameover.newbest .panel::before { left: -0.7rem; }
 #gameover.newbest .panel::after { right: -0.7rem; animation-delay: 0.4s; }
 
-/* ---------- 리더보드 (게임오버 패널 안) ---------- */
+/* ---------- 리더보드 (게임오버·리더보드 화면 공용) ---------- */
 
-#leaderboard { margin: 0 0 1rem; }
-#leaderboard[hidden] { display: none; }
-#leaderboard .lb-title { font-size: 1.05rem; font-weight: 900; margin: 0 0 0.4rem; }
 #ranking {
   margin: 0 auto 0.4rem;
   padding-left: 1.6rem;
@@ -415,6 +412,39 @@ body {
 #submit-score:disabled { opacity: 0.55; cursor: default; box-shadow: none; }
 #submit-score:not(:disabled):active { transform: translateY(3px); box-shadow: 0 1px 0 var(--pink); }
 .lb-hint { margin: 0.4rem 0 0; font-size: 0.8rem; color: #9ca3af; }
+
+/* 게임오버·리더보드 화면의 버튼 행 */
+.btn-row {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 0.4rem;
+}
+/* 보조 버튼 — 주 버튼(핑크)과 구분되는 하늘색 */
+.btn-sub {
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 800;
+  padding: 0.7rem 1.3rem;
+  border: none;
+  border-radius: 999px;
+  background: #fff;
+  color: #2a6bb0;
+  border: 3px solid var(--sky-border);
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--sky-shadow);
+}
+.btn-sub:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--sky-shadow); }
+#newbest-form { margin: 0 0 0.8rem; }
+#newbest-form[hidden] { display: none; }
+#submit-status {
+  min-height: 1.2rem;
+  margin: 0.3rem 0 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #6b7280;
+}
 
 /* ---------- 연출 keyframes (클래스 토글은 game.js) ---------- */
 
