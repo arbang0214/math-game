@@ -40,6 +40,11 @@ const nicknameEl = document.getElementById('nickname');
 const submitScoreBtn = document.getElementById('submit-score');
 const lbStatusEl = document.getElementById('lb-status');
 
+const endingScreenEl = document.getElementById('ending-screen');
+const quitGameBtn = document.getElementById('quit-game');
+const lbQuitBtn = document.getElementById('lb-quit');
+const goHomeBtn = document.getElementById('go-home');
+
 // 최고점: localStorage (사생활 보호 모드 등에서 막혀 있으면 이번 세션만 기억)
 const BEST_KEY = 'math-game.best';
 function loadBest() {
@@ -148,6 +153,7 @@ const screenEls = {
   start: startScreenEl,
   gameover: gameoverEl,
   leaderboard: leaderboardScreenEl,
+  ending: endingScreenEl,
 };
 let screen = 'start';
 function showScreen(name) {
@@ -404,6 +410,10 @@ nicknameEl.addEventListener('keydown', (e) => {
 
 showRankingBtn.addEventListener('click', showLeaderboard);
 lbRestartBtn.addEventListener('click', startGame);
+
+quitGameBtn.addEventListener('click', () => showScreen('ending'));
+lbQuitBtn.addEventListener('click', () => showScreen('ending'));
+goHomeBtn.addEventListener('click', () => showScreen('start'));
 
 // 실제 시계: 매 프레임 흐른 시간을 core에 주입한다.
 // 탭 전환 등으로 프레임이 오래 멈췄을 때 한 번에 시간이 다 깎이지 않도록 상한을 둔다.
