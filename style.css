@@ -298,6 +298,9 @@ body {
   padding: 1.5rem 2.2rem;
   text-align: center;
   box-shadow: 0 8px 0 rgba(0, 0, 0, 0.15);
+  /* 컷+리더보드로 패널이 길어짐 — 짧은 화면에선 패널 안에서 스크롤 */
+  max-height: calc(100svh - 2rem);
+  overflow-y: auto;
 }
 #gameover-cut {
   display: block;
