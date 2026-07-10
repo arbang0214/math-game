@@ -45,7 +45,7 @@
 
 ## 현재 상태 / 미결사항
 
-- 빌드 8단계(전체 리더보드)까지 완료 — 테스트 92개 통과(36+32+8+16).
+- 빌드 8단계(전체 리더보드)까지 완료 — 테스트 97개 통과(36+32+8+21).
   공개 URL: https://arbang0214.github.io/math-game/ (origin/master root에서
   자동 배포 — master에 push하면 곧 반영됨). 5단계 스펙:
   `docs/specs/problem-types.md`
@@ -64,9 +64,10 @@
 - 점수 규칙: 정답당 `BASE_SCORE`(10) × 배율, 연속 정답 `COMBO_STEP`(3)개마다
   배율 +1, 상한 `MAX_MULTIPLIER`(4). 오답/시간초과 시 콤보만 리셋, 점수 유지
 - 최고점은 localStorage 키 `math-game.best` — 저장/읽기는 game.js에만 있음
-- 레벨: 점수 `LEVEL_SCORE_STEP`(100)마다 +1. 제한시간은 레벨당
-  `TIME_STEP_MS`(0.5초)씩 감소, 하한 `TIME_MIN_MS`(6초) — UI는 상수가 아니라
-  `state.timeLimitMs`를 읽는다. 유형 혼합 비율·분모/배수 범위도 레벨을 따름
+- 레벨: 점수 `LEVEL_SCORE_STEP`(100)마다 +1. 제한시간은 기본
+  `TIME_LIMIT_MS`(12초)에서 레벨당 `TIME_STEP_MS`(0.5초)씩 감소, 하한
+  `TIME_MIN_MS`(8초) — UI는 상수가 아니라 `state.timeLimitMs`를 읽는다.
+  목숨은 `MAX_HEARTS`(5). 유형 혼합 비율·분모/배수 범위도 레벨을 따름
   (problems.js의 `*ForLevel` 함수들, 생성기 시그니처는 `(level, rng)`)
 - 유형별 시간/배점 차등은 **미결** (6단계 범위에서 의도적으로 제외)
 - 전체 리더보드(8단계): Supabase 무료 플랜 — 스키마·RLS는
@@ -74,3 +75,8 @@
   `leaderboard.js`, 접속 정보는 `leaderboard-config.js`(anon key 공개 전제,
   비어 있으면 UI 숨김). 무료 플랜 7일 정지 방지용 keepalive cron이
   `.github/workflows/supabase-keepalive.yml`에 있음
+- 화면 흐름: 시작 → 플레이 → 게임오버(다시 시작/순위 확인/게임 종료) →
+  리더보드/엔딩. 전환은 game.js `showScreen()` 단일 경로, 시작 전엔 타이머
+  정지(`screen === 'playing'` 게이트). 점수 등록은 **TOP 10 진입 가능할
+  때만**(`qualifiesForTop`, 게임오버 시 조회 후 비동기 판정). 스펙:
+  `docs/superpowers/specs/2026-07-10-screen-flow-design.md`
