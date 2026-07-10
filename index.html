@@ -51,6 +51,15 @@
     </div>
   </main>
 
+  <!-- 시작 화면 — 접속 시 처음 보이는 오버레이 (hidden 없음), 전환은 game.js showScreen -->
+  <div id="start-screen">
+    <div class="panel">
+      <img class="screen-rabbit" src="assets/rabbit-idle.png" alt="">
+      <p class="screen-bubble">친구들아, 분수와 소수로<br>즐거운 게임 해보자!</p>
+      <button id="start-game">게임 시작</button>
+    </div>
+  </div>
+
   <div id="gameover" hidden>
     <div class="panel">
       <!-- 스크롤은 panel-body가 담당 — 신기록 별(::before/::after)은 panel에 남아 잘리지 않는다 -->

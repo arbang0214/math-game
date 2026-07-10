@@ -281,7 +281,7 @@ body {
 
 /* ---------- 게임 오버 ---------- */
 
-#gameover {
+#gameover, #start-screen, #leaderboard-screen, #ending-screen {
   position: fixed;
   inset: 0;
   z-index: 10;
@@ -290,8 +290,9 @@ body {
   justify-content: center;
   background: rgba(61, 61, 61, 0.45);
 }
-#gameover[hidden] { display: none; }
-#gameover .panel {
+#gameover[hidden], #start-screen[hidden],
+#leaderboard-screen[hidden], #ending-screen[hidden] { display: none; }
+.panel {
   position: relative;
   background: #fff;
   border-radius: 24px;
@@ -305,7 +306,24 @@ body {
   display: flex;
   flex-direction: column;
 }
-#gameover .panel-body { overflow-y: auto; }
+.panel-body { overflow-y: auto; }
+
+/* 시작·엔딩 화면의 토끼와 대사 */
+.screen-rabbit {
+  display: block;
+  width: 8rem;
+  height: 12rem;
+  object-fit: contain;
+  margin: 0 auto 0.6rem;
+}
+.screen-bubble {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0 0 1.2rem;
+  line-height: 1.5;
+}
+
 #gameover-cut {
   display: block;
   width: 5rem;
@@ -313,7 +331,7 @@ body {
   object-fit: contain;
   margin: 0 auto 0.5rem;
 }
-#gameover .panel .title {
+.panel .title {
   font-size: 1.7rem;
   font-weight: 900;
   margin: 0 0 0.7rem;
@@ -324,7 +342,7 @@ body {
   color: #374151;
   margin: 0 0 1rem;
 }
-#restart {
+#restart, #start-game {
   font-family: inherit;
   font-size: 1.2rem;
   font-weight: 800;
@@ -336,7 +354,7 @@ body {
   cursor: pointer;
   box-shadow: 0 5px 0 var(--pink);
 }
-#restart:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--pink); }
+#restart:active, #start-game:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--pink); }
 /* 신기록: 패널이 통통 튀고 별이 반짝인다 */
 #gameover.newbest .panel { animation: pop 0.5s ease; }
 #gameover.newbest .panel::before,

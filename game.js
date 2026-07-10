@@ -24,6 +24,8 @@ const nextBtn = document.getElementById('next');
 const gameoverEl = document.getElementById('gameover');
 const gameoverCutEl = document.getElementById('gameover-cut');
 const restartBtn = document.getElementById('restart');
+const startScreenEl = document.getElementById('start-screen');
+const startGameBtn = document.getElementById('start-game');
 
 const gameEl = document.getElementById('game');
 const mascotEl = document.getElementById('mascot');
@@ -130,11 +132,32 @@ let isNewBest = false;
 // 직전에 고른 보기 — 결과 공개 때 .picked 표시용 (UI 전용 상태)
 let lastChoice = null;
 
+// ---------- 화면 전환 (표시 전용) ----------
+// 오버레이를 hidden 토글로 전환한다. 'playing'은 오버레이가 없는 상태.
+// 이후 leaderboard/ending 화면이 이 객체에 키를 추가한다.
+const screenEls = {
+  start: startScreenEl,
+  gameover: gameoverEl,
+};
+let screen = 'start';
+function showScreen(name) {
+  screen = name;
+  for (const [key, el] of Object.entries(screenEls)) el.hidden = key !== name;
+}
+
+// 새 게임 시작 — 어느 화면의 [다시 시작]이든 여기로 모인다
+function startGame() {
+  lastChoice = null;
+  showScreen('playing');
+  update(createGame());
+}
+
 // 상태 교체 지점을 한 곳으로 모아 gameover 진입 시에만 최고점을 갱신한다
 function update(newState) {
   const prevState = state;
   state = newState;
   if (prevState.phase !== 'gameover' && state.phase === 'gameover') {
+    showScreen('gameover');
     isNewBest = state.score > best;
     if (isNewBest) {
       best = state.score;
@@ -309,7 +332,6 @@ function render() {
     );
   }
   nextBtn.hidden = state.phase !== 'feedback';
-  gameoverEl.hidden = state.phase !== 'gameover';
   if (state.phase === 'gameover') {
     gameoverEl.classList.toggle('newbest', isNewBest);
     // 신기록이면 만세 컷, 아니면 시무룩 컷 (표시 전용 분기)
@@ -354,10 +376,8 @@ nextBtn.addEventListener('click', () => {
   lastChoice = null;
   update(next(state));
 });
-restartBtn.addEventListener('click', () => {
-  lastChoice = null;
-  update(createGame());
-});
+restartBtn.addEventListener('click', startGame);
+startGameBtn.addEventListener('click', startGame);
 
 // 등록 중(버튼 비활성)이거나 이미 등록했으면 무시 — Enter 연타로 인한 이중 POST 방지
 function trySubmitScore() {
@@ -375,7 +395,8 @@ let lastTs = null;
 function frame(ts) {
   const elapsed = lastTs === null ? 0 : Math.min(ts - lastTs, 250);
   lastTs = ts;
-  if (state.phase === 'question' && elapsed > 0) {
+  // 시작·게임오버 등 오버레이가 떠 있는 동안에는 타이머가 흐르지 않는다
+  if (screen === 'playing' && state.phase === 'question' && elapsed > 0) {
     update(tick(state, elapsed));
   }
   requestAnimationFrame(frame);
@@ -385,4 +406,5 @@ requestAnimationFrame(frame);
 // 설정이 비어 있으면 리더보드 섹션을 통째로 숨긴다 (Supabase 셋업 전에도 게임은 동작)
 leaderboardEl.hidden = !isConfigured(LEADERBOARD_CONFIG);
 
+showScreen('start');
 render();
