@@ -3,6 +3,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node test-problems.js && node test-game-core.js && node test-format.js"
+    "test": "node test-problems.js && node test-game-core.js && node test-format.js && node test-leaderboard.js"
   }
 }
