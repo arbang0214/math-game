@@ -130,10 +130,14 @@ async function submitScore() {
     });
     const res = await fetch(url, options);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    // 응답 대기 중 [다시 시작]/[게임 종료]로 화면을 떠났으면 결과를 버린다
+    // (늦은 응답이 새 게임 위로 리더보드를 덮거나 scoreSubmitted를 오염시키지 않게)
+    if (screen !== 'gameover') return;
     scoreSubmitted = true;
     saveNickname(checked.nickname);
     showLeaderboard(); // 등록 성공 → 바로 순위 화면
   } catch {
+    if (screen !== 'gameover') return;
     submitStatusEl.textContent = '등록에 실패했어요';
     submitScoreBtn.disabled = false; // 재시도 허용
   }

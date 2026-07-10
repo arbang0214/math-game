@@ -279,7 +279,7 @@ test('timeLimitForLevel: 레벨당 0.5초 감소, 하한 8초', () => {
     assert(timeLimitForLevel(level) === ms, `L${level} 제한시간이 ${ms}가 아님: ${timeLimitForLevel(level)}`);
   }
 });
-test('처음 상태는 레벨 1, 제한시간 10초', () => {
+test('처음 상태는 레벨 1, 제한시간 12초', () => {
   const s = createGame(fakeRng([0, 0, 0, 0, 0]));
   assert(s.level === 1, `레벨이 1이 아님: ${s.level}`);
   assert(s.timeLimitMs === TIME_LIMIT_MS, `제한시간이 다름: ${s.timeLimitMs}`);
@@ -300,7 +300,7 @@ test('점수 100이면 다음 문제부터 레벨 2 + 제한시간 9.5초', () =
 });
 
 console.log('레벨/제한시간 (무작위 500회 속성 검사)');
-test('점수가 커질수록 제한시간은 단조 감소하고 항상 [하한, 10초] 안이다', () => {
+test('점수가 커질수록 제한시간은 단조 감소하고 항상 [하한, 12초] 안이다', () => {
   let prevLimit = Infinity;
   for (let i = 0; i < 500; i++) {
     const score = i * 7; // 오름차순 점수 표본

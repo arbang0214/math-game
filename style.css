@@ -71,6 +71,10 @@ body {
 /* 당근 목숨 아이콘 (#carrot-icon 참조는 game.js) — 잃은 목숨은 회색으로 바랜다 */
 .carrot { width: 2rem; height: 2.17rem; }
 .carrot.off { filter: grayscale(1); opacity: 0.4; }
+/* 좁은 폰: 당근 5개가 레벨·점수 칩과 부딪히지 않게 축소 */
+@media (max-width: 380px) {
+  .carrot { width: 1.6rem; height: 1.75rem; }
+}
 #level {
   background: #fff;
   border-radius: 999px;
@@ -427,7 +431,6 @@ body {
   font-size: 1.05rem;
   font-weight: 800;
   padding: 0.7rem 1.3rem;
-  border: none;
   border-radius: 999px;
   background: #fff;
   color: #2a6bb0;
