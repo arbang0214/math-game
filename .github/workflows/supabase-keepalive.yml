@@ -1,0 +1,23 @@
+# Supabase 무료 플랜은 7일간 DB 활동이 없으면 일시정지된다 — 주 2회 조회로 깨어 있게 유지.
+# URL과 anon key는 공개 전제(RLS가 방어선)라 평문으로 둔다 (leaderboard-config.js와 같은 값).
+name: supabase-keepalive
+on:
+  schedule:
+    - cron: '0 0 * * 1,4' # 월·목 UTC 00:00 (KST 09:00)
+  workflow_dispatch: {}
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ''      # Task 4(셋업)에서 기입
+      SUPABASE_ANON_KEY: '' # Task 4(셋업)에서 기입
+    steps:
+      - name: DB 활동 기록용 TOP 1 조회
+        run: |
+          if [ -z "$SUPABASE_URL" ]; then
+            echo "Supabase 미설정 — 건너뜀"
+            exit 0
+          fi
+          curl -sf "$SUPABASE_URL/rest/v1/scores?select=score&limit=1" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY"
