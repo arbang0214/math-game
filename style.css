@@ -30,7 +30,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(180deg, var(--sky) 0%, var(--cream) 100%) fixed;
+  background:
+    url('assets/background.jpg') center top / cover no-repeat fixed,
+    linear-gradient(180deg, var(--sky) 0%, var(--cream) 100%) fixed;
   font-family: 'Trebuchet MS', 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
   color: var(--ink);
   -webkit-tap-highlight-color: transparent;
@@ -296,6 +298,13 @@ body {
   padding: 1.5rem 2.2rem;
   text-align: center;
   box-shadow: 0 8px 0 rgba(0, 0, 0, 0.15);
+}
+#gameover-cut {
+  display: block;
+  width: 5rem;
+  height: 7.5rem;
+  object-fit: contain;
+  margin: 0 auto 0.5rem;
 }
 #gameover .panel .title {
   font-size: 1.7rem;

@@ -22,6 +22,7 @@ const choicesEl = document.getElementById('choices');
 const feedbackEl = document.getElementById('feedback');
 const nextBtn = document.getElementById('next');
 const gameoverEl = document.getElementById('gameover');
+const gameoverCutEl = document.getElementById('gameover-cut');
 const restartBtn = document.getElementById('restart');
 
 const gameEl = document.getElementById('game');
@@ -311,6 +312,8 @@ function render() {
   gameoverEl.hidden = state.phase !== 'gameover';
   if (state.phase === 'gameover') {
     gameoverEl.classList.toggle('newbest', isNewBest);
+    // 신기록이면 만세 컷, 아니면 시무룩 컷 (표시 전용 분기)
+    gameoverCutEl.src = isNewBest ? 'assets/rabbit-cheer.png' : 'assets/rabbit-sad.png';
     finalScoreEl.textContent = isNewBest
       ? `🎉 신기록! ${state.score}점`
       : `점수 ${state.score}점 · 최고점 ${best}점`;
