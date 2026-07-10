@@ -45,10 +45,10 @@
 
 ## 현재 상태 / 미결사항
 
-- 빌드 7단계(GitHub Pages 배포) 완료 — 테스트 76개 통과(36+32+8).
+- 빌드 8단계(전체 리더보드)까지 완료 — 테스트 92개 통과(36+32+8+16).
   공개 URL: https://arbang0214.github.io/math-game/ (origin/master root에서
-  자동 배포 — master에 push하면 곧 반영됨). 8단계(전체 리더보드)는 서버 설계
-  필요. 5단계 스펙: `docs/specs/problem-types.md`
+  자동 배포 — master에 push하면 곧 반영됨). 5단계 스펙:
+  `docs/specs/problem-types.md`
 - 화면 디자인 개편(팝 카툰 테마 + 리본 토끼 마스코트) 완료 — 스펙:
   `docs/superpowers/specs/2026-07-07-visual-redesign-design.md`
 - 마스코트 v8 리디자인 + 당근 목숨 완료(2026-07-08) — 토끼 SVG 좌표는
@@ -67,5 +67,8 @@
   `state.timeLimitMs`를 읽는다. 유형 혼합 비율·분모/배수 범위도 레벨을 따름
   (problems.js의 `*ForLevel` 함수들, 생성기 시그니처는 `(level, rng)`)
 - 유형별 시간/배점 차등은 **미결** (6단계 범위에서 의도적으로 제외)
-- 전체 리더보드는 서버가 필요하며 **아직 설계되지 않음** — 관련 코드를
-  미리 만들거나 구조를 가정하지 말 것. MVP는 localStorage 최고점만 사용
+- 전체 리더보드(8단계): Supabase 무료 플랜 — 스키마·RLS는
+  `docs/superpowers/specs/2026-07-10-leaderboard-design.md`. 순수 로직은
+  `leaderboard.js`, 접속 정보는 `leaderboard-config.js`(anon key 공개 전제,
+  비어 있으면 UI 숨김). 무료 플랜 7일 정지 방지용 keepalive cron이
+  `.github/workflows/supabase-keepalive.yml`에 있음

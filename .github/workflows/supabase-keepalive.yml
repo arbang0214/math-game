@@ -9,8 +9,8 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     env:
-      SUPABASE_URL: ''      # Task 4(셋업)에서 기입
-      SUPABASE_ANON_KEY: '' # Task 4(셋업)에서 기입
+      SUPABASE_URL: 'https://siasbidswsiirgddkshg.supabase.co'
+      SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpYXNiaWRzd3NpaXJnZGRrc2hnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NjI0MTQsImV4cCI6MjA5OTIzODQxNH0.f8HqBEsJNV-u7VGb4iv6Q9BFZ6kwhQCTh67v4pGxLso'
     steps:
       - name: DB 활동 기록용 TOP 1 조회
         run: |
